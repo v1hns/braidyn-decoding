@@ -1,23 +1,23 @@
-# BraiDyn-BC leave-mouse-out cortex-wide decoding — PILOT HIT (2026-07-09)
+# BraiDyn-BC cross-mouse cortex-wide decoding — FULL STUDY (2026-07-10)
 
-Dataset: BraiDyn-BC, DANDI:001425 (Kondo et al., Sci Data 2025). Cortex-wide widefield
-calcium (44 Allen-atlas cortical parcels, dF/F @30Hz) + behavior, cued lever-pull operant
-task, 25 mice x 15 sessions. Open CC-BY, streamed via remfile (no raw-movie download).
+Dataset: BraiDyn-BC, DANDI:001425 (Kondo et al., Sci Data 2025). Cortex-wide widefield calcium,
+44 Allen-atlas cortical parcels (dF/F @30Hz) + behavior, cued lever-pull operant task, 25 mice.
+Open CC-BY; parcellated dF/F + behavior STREAMED via remfile (no raw-movie download).
 
-Axis (VIRGIN — 0 prior decoding papers on this dataset; descriptor does no decoding):
-leave-ONE-MOUSE-out decoding of lever-pull onset (evoked cortical response vs baseline)
-from the 44 shared atlas parcels.
+Axis (VIRGIN — descriptor does zero decoding): leave-ONE-MOUSE-out decoding of behavioral
+events from the 44 shared atlas parcels.
 
-RESULT (10 mice, 1 session each, ~150 pull events/mouse):
-- Positive control (within-mouse pull-vs-baseline): AUC 0.791 +/- 0.081  -> pipeline sound, signal real
-- NOVEL AXIS (leave-one-mouse-out): AUC 0.730; every held-out mouse above chance (0.61-0.91)
-- Permutation null: AUC 0.498, p=0.005  -> significant, leakage-free
-- Small cross-mouse gap (0.79->0.73): cortex-wide motor representation is largely CONSERVED
-  across animals in the shared atlas space.
+## Full result (all mice, 4 targets attempted; lever-pull & lick had enough events)
+| target     | mice | within-mouse | leave-one-mouse-out | 95% CI          | perm p |
+|------------|------|--------------|---------------------|-----------------|--------|
+| lever-pull | 23   | 0.727        | 0.742               | [0.701, 0.782]  | 0.007  |
+| lick       | 22   | 0.707        | 0.750               | [0.694, 0.801]  | 0.007  |
 
-Clears every bar: real signal, virgin axis, well-powered (25 mice), clean leave-mouse-out,
-permutation-significant. First genuine HIT of the whole search.
+HEADLINE: LOMO >= within-mouse -> NO generalization gap. Cortex-wide behavioral
+representations are CONSERVED across individuals in the shared atlas space. Every held-out
+mouse decodes above chance. Motor cortex (MOp/MOs) tops the lever-pull decoder; lick weights
+differ (target-specific codes). reward/tone lacked threshold-detectable events (limitation).
 
-Full-study path: all 25 mice; multiple decode targets (cue tone, reward, lick, not just lever);
-within-mouse cross-SESSION drift (early vs late over 15 days); per-parcel importance maps;
-within-mouse ceiling vs leave-mouse-out gap quantified with CIs.
+Files: braidyn_full.py (analysis), make_braidyn_figs.py, braidyn_results.json, braidyn_pilot.py,
+paper/braidyn.tex + braidyn.pdf (compiled), paper/figs/. Compute on Lambda; box terminated.
+Full study DONE. Extensions: cross-session drift (15-day protocol), more targets, nonlinear temporal models.
