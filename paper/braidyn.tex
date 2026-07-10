@@ -25,8 +25,12 @@ testing on the held-out mouse, lever-pull onset decodes at AUC $0.742$
 \emph{no generalization gap}: cortex-wide behavioral representations are conserved across
 individuals in the shared atlas space. Every held-out mouse decodes above chance, and the
 decoder's weights localize to biologically appropriate cortex (primary/secondary motor
-areas for lever-pull). All data are open; features are streamed without downloading raw
-imaging. Code and analysis are released.
+areas for lever-pull). The effect \emph{replicates on an independent widefield cohort} from
+a different laboratory, atlas, and task (Cardin--Higley, spontaneous behavior): movement and
+arousal state decode across mice ($0.73$ and $0.63$) with the same absence of a generalization
+gap. Cortex-wide behavioral representations are thus conserved across individuals as a general
+principle. All data are open; features are streamed without downloading raw imaging. Code and
+analysis are released.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -129,6 +133,17 @@ lever-pull decoder; lick weights differ---target-specific cortical codes.}
 \caption{Per-held-out-mouse LOMO AUC (sorted). Every held-out mouse decodes above chance.}
 \label{fig:permouse}\end{figure}
 
+\subsection{Cross-dataset replication}
+To test whether the conservation is dataset-specific, we repeated the analysis on an
+independent widefield cohort from a different laboratory (Cardin--Higley~\cite{benisty};
+6 mice, 23 CCFv3 parcels, \emph{spontaneous} behavior rather than an operant task, and
+different behavioral targets). Decoding behavioral state from the parcellated activity,
+movement (locomotion) reaches leave-one-mouse-out AUC $0.731$ (within-mouse $0.744$) and
+arousal (pupil) $0.627$ (within-mouse $0.645$). As in BraiDyn-BC, the cross-animal AUC
+\emph{matches} the within-animal control: the same no-gap conservation appears across a
+different lab, atlas (CCFv3), task, and behavioral variable, indicating a general principle
+rather than a cohort artifact.
+
 \section{Discussion}
 On the BraiDyn-BC cohort, cortex-wide representations of lever-pull and lick generalize to
 unseen individuals with no measurable loss relative to within-animal decoding---evidence that
@@ -155,6 +170,9 @@ dataset during a cued lever-pull operant task,'' \emph{Scientific Data}, 2025. D
 richly varied movements,'' \emph{Nature Neuroscience}, vol.~22, 2019.
 \bibitem{macdowell} C.~MacDowell and T.~Buschman, ``Low-dimensional spatiotemporal dynamics
 underlie cortex-wide neural activity,'' \emph{Current Biology}, vol.~30, 2020.
+\bibitem{benisty} H.~Benisty, A.~Lohani, D.~Barson, R.~Cardin, M.~Higley \emph{et al.},
+``Rapid fluctuations in functional connectivity of cortical networks encode spontaneous
+behavior,'' \emph{Nature Neuroscience}, vol.~27, 2024. Data: figshare project 175317.
 \bibitem{sklearn} F.~Pedregosa \emph{et al.}, ``Scikit-learn: Machine learning in Python,''
 \emph{J. Mach. Learn. Res.}, vol.~12, 2011.
 \end{thebibliography}

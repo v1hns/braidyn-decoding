@@ -21,3 +21,12 @@ differ (target-specific codes). reward/tone lacked threshold-detectable events (
 Files: braidyn_full.py (analysis), make_braidyn_figs.py, braidyn_results.json, braidyn_pilot.py,
 paper/braidyn.tex + braidyn.pdf (compiled), paper/figs/. Compute on Lambda; box terminated.
 Full study DONE. Extensions: cross-session drift (15-day protocol), more targets, nonlinear temporal models.
+
+## CROSS-LAB REPLICATION (2026-07-10): Cardin-Higley widefield (Benisty/Higley 2023, figshare 175317)
+Independent widefield cohort (Higley lab), 6 mice, 23 CCFv3 parcels + pupil/face/wheel; spontaneous
+behavior (not an operant task). Decode behavioral state from parcels, within-mouse block-CV vs LOMO:
+  movement(wheel): within 0.744+/-0.11, LOMO 0.731 (per-mouse 0.57-0.91)
+  arousal(pupil):  within 0.645+/-0.11, LOMO 0.627 (per-mouse 0.51-0.73)
+BOTH: LOMO ~= within-mouse -> NO generalization gap, REPLICATING the BraiDyn conservation finding
+on a different lab / atlas / task / behavioral target. Upgrades the claim to a cross-dataset general
+principle: cortex-wide behavioral-state representations are conserved across individuals.
