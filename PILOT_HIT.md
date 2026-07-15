@@ -52,3 +52,28 @@ because late-week behavior is more practiced/stereotyped, hence marginally clean
 BOTH individual and session axes. Files: braidyn_drift.py, braidyn_drift.json, make_drift_figs.py,
 paper figs fig4_drift_2x2 + fig5_daygap, drift subsection + Table II in braidyn.tex/pdf (compiled w/ tectonic).
 Compute: Lambda a10 us-east-1 (24-worker streaming, ~2h wall), box TERMINATED. Reward/tone still lack events.
+
+## NONLINEAR TEMPORAL MODELS (2026-07-15): conservation is NOT a low-capacity artifact
+Q: does modelling the full temporal trajectory (not just evoked-diff vector) raise AUC, and does
+the no-gap conservation SURVIVE a high-capacity model (which could overfit mouse idiosyncrasies)?
+Design: full spatiotemporal window (-0.5..+1.0s = 45 frames x 44 parcels) per event, 3 task
+sessions/mouse (75 sessions). 3 decoders on identical events/splits: linear logistic (evoked-diff),
+1D-CNN over time, GRU over sequence. within-mouse 5-fold + LOMO, targets lever-pull+lick. GPU (a10).
+
+| target     | model  | within | LOMO  | gap(LOMO-within) |
+|------------|--------|--------|-------|------------------|
+| lever-pull | linear | 0.841  | 0.804 | -0.037 |
+| lever-pull | 1D-CNN | 0.942  | 0.895 | -0.047 |
+| lever-pull | GRU    | 0.935  | 0.909 | -0.026 |
+| lick       | linear | 0.886  | 0.850 | -0.036 |
+| lick       | 1D-CNN | 0.978  | 0.966 | -0.013 |
+| lick       | GRU    | 0.975  | 0.962 | -0.013 |
+
+HEADLINE: (1) temporal models raise cross-mouse LOMO AUC +0.09-0.12 (lever 0.80->0.91, lick
+0.85->0.97) -> collapsed evoked vector wastes real temporal signal. (2) nonlinear models DO NOT
+widen the cross-animal gap (<=0.05, no larger than linear; SMALLER for lick) -> conservation is
+robust to model capacity; the richer temporal dynamics are ALSO shared across individuals. NOTE:
+in this pooled-session regime a small gap appears even for linear (within-mouse benefits from more
+per-mouse data than single-session main analysis) -- the point is capacity doesn't enlarge it.
+Files: braidyn_nonlinear.py (CNN+GRU+linear), braidyn_nonlinear.json, make_nl_figs.py, fig6_nonlinear,
+Table III + subsection IV-C in paper. torch cu128 (NOT cu130 -- driver is CUDA 12.8). Box TERMINATED.

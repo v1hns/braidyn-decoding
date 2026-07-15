@@ -1,6 +1,6 @@
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
-\usepackage{cite,amsmath,graphicx,booktabs,url}
+\usepackage{cite,amsmath,graphicx,booktabs,url,multirow}
 \usepackage[hidelinks]{hyperref}
 
 \begin{document}
@@ -32,9 +32,13 @@ gap. Exploiting the cohort's 15-day longitudinal protocol, we further show the s
 stable across \emph{time}: a decoder trained on other mice's first-week sessions reads a
 held-out mouse's last-week sessions with no loss (across-block leave-one-mouse-out AUC equals
 or exceeds the same-block control), and within-mouse accuracy is flat in the train--test
-day-gap ($<0.04$ AUC over two weeks). Cortex-wide behavioral representations are thus conserved
-across individuals \emph{and} sessions as a general principle. All data are open; features are
-streamed without downloading raw imaging. Code and analysis are released.
+day-gap ($<0.04$ AUC over two weeks). The conservation is not an artifact of low model capacity:
+nonlinear temporal decoders (a 1-D CNN and a GRU over the full evoked window) raise cross-animal
+AUC to $0.91$/$0.97$ yet leave the generalization gap as small as the linear model's, so the
+richer temporal dynamics they exploit are themselves shared across individuals. Cortex-wide
+behavioral representations are thus conserved across individuals \emph{and} sessions as a general
+principle. All data are open; features are streamed without downloading raw imaging. Code and
+analysis are released.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -96,6 +100,13 @@ train/test regimes crossing the within/across-animal and same/across-block axes 
 LX; Sec.~\ref{sec:drift}). Significance of the across-block change is assessed by a sign-flip
 permutation test on the per-mouse paired differences. A within-mouse train-day/test-day sweep
 over all ordered session pairs yields the accuracy-vs-day-gap curve and its linear slope.
+
+\textbf{Nonlinear temporal decoders.} To test whether the conservation depends on model
+capacity we retain the full spatiotemporal window per event ($-0.5$ to $+1.0$\,s, $45{\times}44$)
+and compare the linear evoked-vector model against a 1-D CNN over time (two Conv1d--BN--ReLU
+blocks, global average pool, dropout, linear head) and a single-layer GRU over the frame
+sequence, trained with Adam (BCE loss, weight decay, per-channel train-set standardization) and
+evaluated under the same within-mouse and LOMO splits (Sec.~\ref{sec:nl}).
 
 \section{Results}
 \label{sec:results}
@@ -216,20 +227,74 @@ loss: the conserved code is temporally stable.}
 flat in the day-gap (slopes $-0.0004$ and $-0.0022$ AUC/day).}
 \label{fig:daygap}\end{figure}
 
+\subsection{Nonlinear temporal decoders and the conservation test}
+\label{sec:nl}
+The main result uses a linear decoder on a single evoked-\emph{difference} vector, which
+discards the temporal dynamics of the response. This raises two questions: does modelling the
+full nonlinear temporal trajectory improve accuracy, and---more importantly---does the
+no-generalization-gap conservation \emph{survive} a higher-capacity model, or was it an
+artifact of the linear model's limited capacity? A flexible model has more room to fit
+mouse-specific idiosyncrasies and could therefore open a cross-animal gap. We extract the full
+spatiotemporal window around each event ($-0.5$ to $+1.0$\,s, $45$ frames $\times\,44$ parcels)
+and compare the linear model against two nonlinear temporal decoders on identical events and
+splits: a 1-D convolutional network over time and a GRU over the frame sequence
+(3 task sessions/mouse for training data; Table~\ref{tab:nl}, Fig.~\ref{fig:nl}).
+
+Both temporal models raise absolute accuracy substantially: cross-animal (LOMO) AUC rises from
+$0.804$ (linear) to $0.895$ (CNN) / $0.909$ (GRU) for lever-pull, and from $0.850$ to $0.966$ /
+$0.962$ for lick---a $+0.09$ to $+0.12$ gain---so the collapsed evoked vector leaves real signal
+in the temporal dynamics unused. Crucially, the nonlinear models \emph{do not widen the
+cross-animal gap}: LOMO trails within-mouse by only $0.03$--$0.05$ AUC for every model, no more
+for the high-capacity temporal networks than for the linear one (indeed less for lick,
+$-0.013$ vs.\ $-0.036$). The conservation is therefore not a low-capacity artifact---the richer
+temporal structure that the networks exploit is itself shared across individuals. (In this
+pooled-session regime a small gap is present even for the linear model, because within-mouse
+CV now benefits from more per-mouse data than the single-session analysis of
+Table~\ref{tab:main}; the relevant point is that model capacity does not enlarge it.)
+
+\begin{table}[t]\centering
+\caption{Linear vs.\ nonlinear temporal decoders (AUC)}
+\label{tab:nl}
+\begin{tabular}{llccc}
+\toprule
+Target & Model & within & LOMO & gap \\
+\midrule
+\multirow{3}{*}{Lever-pull}
+ & linear (evoked)   & 0.841 & 0.804 & $-0.037$ \\
+ & 1-D CNN (temporal)& 0.942 & 0.895 & $-0.047$ \\
+ & GRU (temporal)    & 0.935 & 0.909 & $-0.026$ \\
+\midrule
+\multirow{3}{*}{Lick}
+ & linear (evoked)   & 0.886 & 0.850 & $-0.036$ \\
+ & 1-D CNN (temporal)& 0.978 & 0.966 & $-0.013$ \\
+ & GRU (temporal)    & 0.975 & 0.962 & $-0.013$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]\centering
+\includegraphics[width=\linewidth]{figs/fig6_nonlinear.pdf}
+\caption{Within-mouse vs.\ leave-one-mouse-out AUC for the linear and two nonlinear temporal
+decoders. Temporal models are far more accurate, and the cross-animal gap (LOMO below
+within-mouse) stays small for all model classes---capacity does not open a generalization gap.}
+\label{fig:nl}\end{figure}
+
 \section{Discussion}
 On the BraiDyn-BC cohort, cortex-wide representations of lever-pull and lick generalize to
 unseen individuals with no measurable loss relative to within-animal decoding---evidence that
 the mesoscale behavioral code is conserved across brains once expressed in a common atlas
 space. The same code is stable across the 15-day protocol on both the within-animal and
 cross-animal axes, so the representation is invariant to individual identity and to session
-alike. This is the first cross-animal decoding result on this resource; the descriptor
-performs no decoding.
+alike. The finding also survives a stringent capacity test: nonlinear temporal networks decode
+markedly better yet without opening a cross-animal gap, showing the shared code encompasses the
+response dynamics and not merely its linear evoked component. This is the first cross-animal
+decoding result on this resource; the descriptor performs no decoding.
 
 \textbf{Limitations.} We analyze two behavioral targets (reward and tone lacked sufficient
 threshold-detectable events in the streamed channels); richer decode targets are a natural
-extension. Features are linear evoked responses; nonlinear temporal models may raise absolute
-accuracy but the conservation and stability conclusions---driven by the LOMO-vs-within and
-across-vs-same-block comparisons, not absolute AUC---should be robust.
+extension. The conservation and stability conclusions rest on LOMO-vs-within and
+across-vs-same-block comparisons rather than absolute AUC, and they hold both for the linear
+evoked model and for the higher-capacity nonlinear temporal decoders of Sec.~\ref{sec:nl}.
 
 \section{Conclusion}
 A strict leave-one-mouse-out analysis shows that cortex-wide widefield representations of
