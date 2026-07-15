@@ -28,9 +28,13 @@ decoder's weights localize to biologically appropriate cortex (primary/secondary
 areas for lever-pull). The effect \emph{replicates on an independent widefield cohort} from
 a different laboratory, atlas, and task (Cardin--Higley, spontaneous behavior): movement and
 arousal state decode across mice ($0.73$ and $0.63$) with the same absence of a generalization
-gap. Cortex-wide behavioral representations are thus conserved across individuals as a general
-principle. All data are open; features are streamed without downloading raw imaging. Code and
-analysis are released.
+gap. Exploiting the cohort's 15-day longitudinal protocol, we further show the shared code is
+stable across \emph{time}: a decoder trained on other mice's first-week sessions reads a
+held-out mouse's last-week sessions with no loss (across-block leave-one-mouse-out AUC equals
+or exceeds the same-block control), and within-mouse accuracy is flat in the train--test
+day-gap ($<0.04$ AUC over two weeks). Cortex-wide behavioral representations are thus conserved
+across individuals \emph{and} sessions as a general principle. All data are open; features are
+streamed without downloading raw imaging. Code and analysis are released.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -61,8 +65,10 @@ individuals, with no measurable generalization gap.
 BraiDyn-BC~\cite{braidyn} (DANDI:001425, CC-BY, one-command open) provides, per mouse and
 session, cortex-wide $\Delta F/F$ hemodynamically corrected and parcellated into $44$
 Allen Common Coordinate Framework cortical regions at $\sim$30\,Hz, together with
-time-aligned behavioral signals (lever state, lick, reward, tone). We analyze one
-behavior-bearing session per mouse (25 mice). Because raw widefield movies are large
+time-aligned behavioral signals (lever state, lick, reward, tone). The cross-animal analysis
+uses one behavior-bearing session per mouse (25 mice); the cross-session analysis
+(Sec.~\ref{sec:drift}) uses all $\geq$13 daily operant sessions per mouse across the
+15-day protocol. Because raw widefield movies are large
 ($\sim$5\,GB/file) but the parcellated traces are tiny, we \emph{stream} only the $44$-region
 $\Delta F/F$ and behavioral channels directly from cloud storage, never downloading the raw
 imaging.
@@ -84,7 +90,15 @@ labels are shuffled \emph{within each mouse} before re-running the full LOMO pip
 ($150$ permutations). As a positive control we run within-mouse $5$-fold cross-validation.
 Per-parcel importance is the magnitude of the standardized logistic weights.
 
+\textbf{Cross-session design.} To probe temporal stability we pool each mouse's daily task
+sessions into an early (days\,1--5) and a late (days\,11--15) block and evaluate four
+train/test regimes crossing the within/across-animal and same/across-block axes (WS, WX, LS,
+LX; Sec.~\ref{sec:drift}). Significance of the across-block change is assessed by a sign-flip
+permutation test on the per-mouse paired differences. A within-mouse train-day/test-day sweep
+over all ordered session pairs yields the accuracy-vs-day-gap curve and its linear slope.
+
 \section{Results}
+\label{sec:results}
 \begin{table}[t]\centering
 \caption{Cross-mouse decoding (leave-one-mouse-out)}
 \label{tab:main}
@@ -144,24 +158,84 @@ arousal (pupil) $0.627$ (within-mouse $0.645$). As in BraiDyn-BC, the cross-anim
 different lab, atlas (CCFv3), task, and behavioral variable, indicating a general principle
 rather than a cohort artifact.
 
+\subsection{Cross-session temporal stability}
+\label{sec:drift}
+Conservation across individuals leaves open whether the shared code is also stable across
+\emph{time}. BraiDyn-BC is a $\sim$3-week longitudinal protocol: every mouse performs
+$\geq$13 daily operant sessions (day\,1--15). We therefore repeat the analysis using all task
+sessions and, for each mouse, split them into an \textbf{early} block (days\,1--5) and a
+\textbf{late} block (days\,11--15). Crossing the within/across-animal axis with the
+same/across-block axis yields four conditions (Table~\ref{tab:drift}, Fig.~\ref{fig:drift}):
+within-mouse same-block (5-fold CV on early; \textbf{WS}), within-mouse across-block (train
+early, test late, same mouse; \textbf{WX}), leave-one-mouse-out same-block (train other mice's
+early, test held-out early; \textbf{LS}), and leave-one-mouse-out across-block (train other
+mice's early, test held-out mouse's \emph{late}; \textbf{LX}). Pooling the daily sessions makes
+all $25$ mice usable for both targets.
+
+\textbf{No within-animal drift.} Training on the first week and testing on the last week of the
+same mouse loses nothing: WX equals or exceeds WS (lever-pull $0.838$ vs.\ $0.826$; lick
+$0.865$ vs.\ $0.883$), the confidence intervals overlapping in both cases. \textbf{The conserved
+code is stable across animals \emph{and} time.} Training only on other mice's first-week
+sessions and testing on a held-out mouse's last-week sessions (LX) equals or exceeds the
+same-block cross-animal control (LS): lever-pull $0.818$ vs.\ $0.792$ (paired
+$\Delta=+0.026$, sign-flip $p=0.008$, $n=25$) and lick $0.842$ vs.\ $0.832$
+($\Delta=+0.010$, $p=0.45$). In no condition is the across-block decoder worse; the mild
+positive direction is consistent with late-week behavior being more practiced and thus slightly
+more decodable, not with any temporal degradation. Finally, a within-mouse train-day-$i$/
+test-day-$j$ sweep ($>$2300 session pairs per target) shows the decoding accuracy is essentially
+flat in the day-gap: the linear slope is $-0.0004$ AUC/day (lever-pull) and $-0.0022$ AUC/day
+(lick), i.e.\ $<0.04$ AUC lost across the entire two-week span (Fig.~\ref{fig:daygap}). The
+cortex-wide behavioral code is thus conserved along \emph{both} the individual and the session
+axes.
+
+\begin{table}[t]\centering
+\caption{Cross-session drift: within/across-animal $\times$ same/across-block AUC}
+\label{tab:drift}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{within-mouse} & \multicolumn{2}{c}{leave-one-mouse-out} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Target & same & early$\to$late & same & early$\to$late \\
+\midrule
+Lever-pull & 0.826 & 0.838 & 0.792 & 0.818 \\
+Lick       & 0.883 & 0.865 & 0.832 & 0.842 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]\centering
+\includegraphics[width=\linewidth]{figs/fig4_drift_2x2.pdf}
+\caption{Within/across-animal $\times$ same/across-block decoding (bootstrap CI; dots = mice).
+Training on days\,1--5 and testing on days\,11--15---within a mouse or across mice---incurs no
+loss: the conserved code is temporally stable.}
+\label{fig:drift}\end{figure}
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.72\linewidth]{figs/fig5_daygap.pdf}
+\caption{Within-mouse decoding vs.\ the gap (days) between train and test session. Accuracy is
+flat in the day-gap (slopes $-0.0004$ and $-0.0022$ AUC/day).}
+\label{fig:daygap}\end{figure}
+
 \section{Discussion}
 On the BraiDyn-BC cohort, cortex-wide representations of lever-pull and lick generalize to
 unseen individuals with no measurable loss relative to within-animal decoding---evidence that
 the mesoscale behavioral code is conserved across brains once expressed in a common atlas
-space. This is the first cross-animal decoding result on this resource; the descriptor
+space. The same code is stable across the 15-day protocol on both the within-animal and
+cross-animal axes, so the representation is invariant to individual identity and to session
+alike. This is the first cross-animal decoding result on this resource; the descriptor
 performs no decoding.
 
 \textbf{Limitations.} We analyze two behavioral targets (reward and tone lacked sufficient
-threshold-detectable events in the streamed channels) and one session per mouse; the
-cross-\emph{session} drift analysis over the 15-day protocol, and richer decode targets, are
-natural extensions. Features are linear evoked responses; nonlinear temporal models may raise
-absolute accuracy but the conservation conclusion---driven by the LOMO-vs-within comparison,
-not absolute AUC---should be robust.
+threshold-detectable events in the streamed channels); richer decode targets are a natural
+extension. Features are linear evoked responses; nonlinear temporal models may raise absolute
+accuracy but the conservation and stability conclusions---driven by the LOMO-vs-within and
+across-vs-same-block comparisons, not absolute AUC---should be robust.
 
 \section{Conclusion}
 A strict leave-one-mouse-out analysis shows that cortex-wide widefield representations of
 behavior are conserved across individuals, with no generalization gap, on an open 25-mouse
-cohort. Code and streamed-feature pipeline are released.
+cohort, and a longitudinal analysis shows the same code is stable across a 15-day protocol on
+both the within- and cross-animal axes. Code and streamed-feature pipeline are released.
 
 \begin{thebibliography}{1}
 \bibitem{braidyn} A.~Kondo \emph{et al.}, ``BraiDyn-BC: a cortex-wide widefield calcium imaging

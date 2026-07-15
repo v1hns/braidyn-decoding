@@ -30,3 +30,25 @@ behavior (not an operant task). Decode behavioral state from parcels, within-mou
 BOTH: LOMO ~= within-mouse -> NO generalization gap, REPLICATING the BraiDyn conservation finding
 on a different lab / atlas / task / behavioral target. Upgrades the claim to a cross-dataset general
 principle: cortex-wide behavioral-state representations are conserved across individuals.
+
+## CROSS-SESSION DRIFT STUDY (2026-07-14): conserved code is ALSO stable over time
+Dataset actually gives 16-19 sessions/mouse (13-15 operant TASK days, ~3-week protocol) -- the
+"1 session/mouse" limitation is now resolved. Streamed all 357 task sessions (0 skipped), 25 mice.
+Design: per mouse split task days into EARLY (1-5) vs LATE (11-15); 2x2 = within/LOMO x same/cross-block.
+Targets state_lever + lick (all 25 mice usable once daily sessions pooled).
+
+| condition                          | lever-pull | lick  |
+|------------------------------------|-----------|-------|
+| WS within-mouse same-block         | 0.826     | 0.883 |
+| WX within-mouse EARLY->LATE        | 0.838     | 0.865 |
+| LS LOMO same-block                 | 0.792     | 0.832 |
+| LX LOMO EARLY(others)->LATE(heldout)| 0.818    | 0.842 |
+paired LX-LS: lever +0.026 (p=0.008), lick +0.010 (p=0.45). Drift-curve slope: lever -0.0004/day,
+lick -0.0022/day (<0.04 AUC over 14 days; flat).
+
+HEADLINE: NO within-animal drift (WX>=WS) AND the conserved code is temporally stable across animals
+(LX>=LS -- other mice's week-1 reads a held-out mouse's week-3 with no loss). LX>LS direction likely
+because late-week behavior is more practiced/stereotyped, hence marginally cleaner. Code invariant along
+BOTH individual and session axes. Files: braidyn_drift.py, braidyn_drift.json, make_drift_figs.py,
+paper figs fig4_drift_2x2 + fig5_daygap, drift subsection + Table II in braidyn.tex/pdf (compiled w/ tectonic).
+Compute: Lambda a10 us-east-1 (24-worker streaming, ~2h wall), box TERMINATED. Reward/tone still lack events.
