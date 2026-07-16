@@ -4,8 +4,12 @@ import numpy as np, matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 plt.rcParams.update({"font.size": 8, "figure.dpi": 200, "savefig.bbox": "tight",
                      "axes.spines.top": False, "axes.spines.right": False})
-OUT = os.path.expanduser("~/braidyn_figs"); os.makedirs(OUT, exist_ok=True)
-R = json.load(open(os.path.expanduser("~/braidyn_results.json")))
+HERE = os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(HERE, "paper", "figs"); os.makedirs(OUT, exist_ok=True)
+_j = os.path.join(HERE, "braidyn_4targets.json")
+if not os.path.exists(_j):
+    _j = os.path.expanduser("~/braidyn_results.json")
+R = json.load(open(_j))
 
 
 def parcel_names():
@@ -29,7 +33,8 @@ def parcel_names():
 
 
 names = parcel_names()
-targets = list(R.keys()); nice = {"state_lever": "lever-pull", "lick": "lick"}
+targets = list(R.keys())
+nice = {"state_lever": "lever-pull", "lick": "lick", "reward": "reward", "tone": "tone"}
 
 # Fig 1: within-mouse vs LOMO AUC per target, with CI + chance
 fig, ax = plt.subplots(figsize=(3.2, 2.5))
@@ -46,7 +51,7 @@ for xi, t in zip(x, targets):
 ax.axhline(0.5, ls="--", c="gray", lw=0.7)
 ax.set_xticks(x); ax.set_xticklabels([nice.get(t, t) for t in targets])
 ax.set_ylabel("decoding AUC"); ax.set_ylim(0.4, 1.0)
-ax.set_title("Cross-mouse cortical decoding\n(no generalization gap; p=0.007)")
+ax.set_title("Cross-mouse cortical decoding, 4 targets\n(every target conserved across mice; p=0.007)")
 ax.legend(fontsize=6, loc="lower right")
 fig.savefig(f"{OUT}/fig1_auc.pdf"); plt.close(fig)
 
