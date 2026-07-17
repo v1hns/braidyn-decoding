@@ -1,12 +1,16 @@
 """BraiDyn-BC cross-SESSION drift study (DANDI:001425).
 
-The full study showed the cortex-wide behavioral code is CONSERVED across individuals
-(LOMO AUC >= within-mouse, no generalization gap), but used ONE session per mouse. The
-dataset is a ~3-week longitudinal protocol: every mouse has ~13-15 operant TASK sessions
-(day1..day15). This asks the obvious next question: is the conserved code also STABLE over
-time, or does it drift across days?
+The full study showed the cortex-wide behavioral code is largely conserved across individuals,
+but used ONE session per mouse. The dataset is a ~3-week longitudinal protocol: every mouse has
+~13-15 operant TASK sessions (day1..day15). This asks the obvious next question: is the conserved
+code also STABLE over time, or does it drift across days?
 
-Design (targets: lever-pull `state_lever`, `lick`):
+ALL FOUR TARGETS (2026-07-16). This script originally ran lever-pull + lick only. That was NOT a
+trial-count limitation -- it predated braidyn_4targets.py, which showed reward/tone were only ever
+"eventless" because the old main analysis read sorted(paths)[0], often a RESTING-STATE session. On
+task sessions reward/tone are well populated, so the early/late split is run for all four here.
+
+Design (targets: `state_lever`, `lick`, `reward`, `tone`):
   Per mouse, split its task sessions into EARLY (day<=5) and LATE (day>=11) blocks.
   Event-triggered features (44 Allen parcels) exactly as the full study, per session, pooled per block.
 
@@ -20,14 +24,14 @@ Design (targets: lever-pull `state_lever`, `lick`):
   Drift curve: within-mouse, train on task session i, test on session j (j>i); AUC binned by day-gap.
 Streams only parcellated dF/F + behavior via remfile. Saves braidyn_drift.json.
 """
-import re, json, sys, socket
+import re, json, sys, os, socket
 import numpy as np
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 socket.setdefaulttimeout(90)   # fail a hung range-read rather than block the whole map forever
 
-TARGETS = ["state_lever", "lick"]
+TARGETS = ["state_lever", "lick", "reward", "tone"]
 EARLY_MAX = 5      # EARLY block = task days 1..5
 LATE_MIN = 11      # LATE block  = task days 11..15
 
@@ -280,8 +284,10 @@ def main():
             print(f"  LX-LS = {ps['mean_LX_minus_LS']:+.3f}  p={ps['p_two_sided']:.3f}  (n={ps['n_pairs']})")
         print(f"  drift slope/day = {curve['slope_per_day']}  ({curve['n_pairs']} session-pairs)")
 
-    json.dump(out, open("/home/ubuntu/braidyn_drift.json", "w"), indent=1)
-    print("\nsaved braidyn_drift.json")
+    # Write next to this script so the run works on any box, not just /home/ubuntu.
+    dest = os.path.join(os.path.dirname(os.path.abspath(__file__)), "braidyn_drift.json")
+    json.dump(out, open(dest, "w"), indent=1)
+    print(f"\nsaved {dest}")
     print("BRAIDYN_DRIFT_DONE")
 
 

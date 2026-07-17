@@ -1,0 +1,40 @@
+{
+ "wheel": {
+  "target": "movement(wheel)",
+  "n_mice": 6,
+  "n_parcels": 23,
+  "n_windows": 6005,
+  "within_mouse_auc": 0.7443809862569858,
+  "within_mouse_sd": 0.11220101787940595,
+  "n_within": 6,
+  "lomo_auc": 0.7308333333333333,
+  "lomo_per_mouse": {
+   "0": 0.57,
+   "1": 0.905,
+   "2": 0.732,
+   "3": 0.707,
+   "4": 0.728,
+   "5": 0.743
+  },
+  "gap_lomo_minus_within": -0.013547652923652453
+ },
+ "pupil": {
+  "target": "arousal(pupil)",
+  "n_mice": 6,
+  "n_parcels": 23,
+  "n_windows": 6005,
+  "within_mouse_auc": 0.6450255297963251,
+  "within_mouse_sd": 0.11197606942776739,
+  "n_within": 6,
+  "lomo_auc": 0.6268333333333334,
+  "lomo_per_mouse": {
+   "0": 0.512,
+   "1": 0.726,
+   "2": 0.602,
+   "3": 0.556,
+   "4": 0.69,
+   "5": 0.675
+  },
+  "gap_lomo_minus_within": -0.01819219646299175
+ }
+}
