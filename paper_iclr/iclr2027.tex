@@ -345,10 +345,14 @@ Capacity raises accuracy markedly but does not open a cross-animal gap.}
 \label{sec:repl}
 \textbf{Replication.} To test dataset-specificity we repeat the analysis on an independent
 widefield cohort from a different laboratory (Cardin--Higley; \citealp{benisty2024}; 6 mice, 23
-CCFv3 parcels, \emph{spontaneous} behavior, different targets). Movement (locomotion) reaches LOMO
-$\auc$ $0.731$ (within-mouse $0.744$) and arousal (pupil) $0.627$ (within $0.645$): the same
-near-ceiling cross-animal readout (gap $0.01$--$0.02$) appears across a different lab, atlas, task,
-and behavioral variable, indicating a general property of cortex rather than a cohort artifact.
+CCFv3 parcels, \emph{spontaneous} behavior, different targets, 6005 windows). Movement
+(locomotion) reaches LOMO $\auc$ $0.731$ (within-mouse $0.744$) and arousal (pupil) $0.627$
+(within $0.645$): the same near-ceiling cross-animal readout (gaps $0.014$ and $0.018$) appears
+across a different lab, atlas, task, and behavioral variable, indicating a general property of
+cortex rather than a cohort artifact. The per-animal spread is wider here than on BraiDyn-BC:
+movement ranges $0.570$--$0.905$ and arousal $0.512$--$0.726$ over the six held-out animals, so the
+weakest held-out animal sits at chance for arousal. We therefore offer this cohort as evidence
+that the small cross-animal \emph{gap} generalizes, not as an equally strong per-animal readout.
 
 \textbf{Localization.} Decoder weights (Fig.~\ref{fig:parcels}) are spatially structured. Ranking
 parcels by standardized-weight magnitude, exactly three of the 44 appear in the top eight of
@@ -419,11 +423,12 @@ All data are open (BraiDyn-BC, DANDI:001425, CC-BY; Cardin--Higley, figshare 175
 the full analysis code and a streaming feature pipeline: every BraiDyn-BC table and figure is
 reproduced from the public parcellated traces without downloading raw widefield movies, and the
 committed result files (\texttt{braidyn\_4targets.json}, \texttt{braidyn\_drift.json},
-\texttt{braidyn\_nonlinear.json}) carry every reported value together with per-mouse breakdowns
-and the 44-parcel ROI table. The independent-cohort replication of Section~\ref{sec:repl} is the
-one analysis that is not streamed: it requires the Cardin--Higley parcel-trace archive to be
-fetched from figshare first, and re-running it emits \texttt{cardin\_results.json}. All splits,
-permutation seeds, and model hyperparameters are specified in Section 3 and the released code.
+\texttt{braidyn\_nonlinear.json}, \texttt{cardin\_results.json}) carry every reported value
+together with per-mouse breakdowns and the 44-parcel ROI table. The independent-cohort
+replication of Section~\ref{sec:repl} is the one analysis that is not streamed: it requires the
+Cardin--Higley parcel-trace archive (six animals, 18\,MB) to be fetched from figshare first. All
+splits, permutation seeds, and model hyperparameters are specified in Section 3 and the released
+code.
 
 \bibliographystyle{plainnat}
 \begin{thebibliography}{99}
