@@ -5,18 +5,31 @@ matplotlib.use("Agg"); import matplotlib.pyplot as plt
 plt.rcParams.update({"font.size": 8, "figure.dpi": 200, "savefig.bbox": "tight",
                      "axes.spines.top": False, "axes.spines.right": False})
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "paper", "figs"); os.makedirs(OUT, exist_ok=True)
+# Write into both paper dirs so the live ICLR draft and the archived IEEE one stay in sync.
+OUTS = [os.path.join(HERE, "paper_iclr", "figs"), os.path.join(HERE, "paper", "figs")]
+for _o in OUTS:
+    os.makedirs(_o, exist_ok=True)
+OUT = OUTS[0]
+
+
+def save(fig, name):
+    for o in OUTS:
+        fig.savefig(os.path.join(o, name))
+
+
 JSON = os.path.join(HERE, "braidyn_nonlinear.json")
 if not os.path.exists(JSON):
     JSON = os.path.expanduser("~/braidyn_nonlinear.json")
 R = json.load(open(JSON))["targets"]
-targets = list(R.keys()); nice = {"state_lever": "lever-pull", "lick": "lick"}
-MODELS = [("linear", "linear\n(evoked)", "#95a5a6"),
-          ("cnn", "1D-CNN\n(temporal)", "#2c6fbb"),
-          ("gru", "GRU\n(temporal)", "#c0392b")]
+ORDER = ["state_lever", "lick", "reward", "tone"]
+targets = [t for t in ORDER if t in R] + [t for t in R if t not in ORDER]
+nice = {"state_lever": "lever-pull", "lick": "lick", "reward": "reward", "tone": "tone"}
+MODELS = [("linear", "linear", "#95a5a6"),
+          ("cnn", "CNN", "#2c6fbb"),
+          ("gru", "GRU", "#c0392b")]
 
 # Fig 6: grouped bars, within vs LOMO per model, one panel per target
-fig, axes = plt.subplots(1, len(targets), figsize=(6.8, 2.9), sharey=True)
+fig, axes = plt.subplots(1, len(targets), figsize=(1.45 * len(targets) + 0.4, 2.6), sharey=True)
 for ax, t in zip(np.atleast_1d(axes), targets):
     x = np.arange(len(MODELS)); w = 0.38
     within = [R[t][k]["within_auc"] for k, _, _ in MODELS]
@@ -24,16 +37,17 @@ for ax, t in zip(np.atleast_1d(axes), targets):
     ax.bar(x - w/2, within, w, label="within-mouse", color="#d7dbdd", edgecolor="k", linewidth=0.5)
     ax.bar(x + w/2, lomo, w, label="leave-mouse-out",
            color=[c for _, _, c in MODELS], edgecolor="k", linewidth=0.5)
-    for xi, (k, _, _) in zip(x, MODELS):
-        g = R[t][k]["gap_lomo_minus_within"]; p = R[t][k]["gap_p"]
-        ax.text(xi, 0.42, f"gap {g:+.3f}\np={p:.2f}", ha="center", fontsize=5.5, color="#555")
+    # Gaps live in Table 3; annotating them here would render on top of the bars
+    # (ylim starts at 0.4, so the bars occupy the low data coords).
     ax.axhline(0.5, ls="--", c="gray", lw=0.7)
-    ax.set_xticks(x); ax.set_xticklabels([lab for _, lab, _ in MODELS], fontsize=6.5)
-    ax.set_title(nice.get(t, t) + f"  (n={R[t]['n_mice']} mice)")
-axes[0].set_ylabel("decoding AUC"); axes[0].set_ylim(0.4, 1.0)
-axes[0].legend(fontsize=6, loc="upper left")
-fig.suptitle("Nonlinear temporal models: higher accuracy, gap stays closed", y=1.04, fontsize=8.5)
-fig.savefig(f"{OUT}/fig6_nonlinear.pdf"); plt.close(fig)
+    ax.set_xticks(x); ax.set_xticklabels([lab for _, lab, _ in MODELS], fontsize=7)
+    ax.set_title(f"{nice.get(t, t)}  (n={R[t]['n_mice']})", fontsize=8)
+np.atleast_1d(axes)[0].set_ylabel("decoding AUC")
+np.atleast_1d(axes)[0].set_ylim(0.4, 1.0)
+np.atleast_1d(axes)[0].legend(fontsize=6, loc="lower left")
+fig.suptitle("Temporal models raise accuracy without systematically widening the cross-animal gap",
+             y=1.04, fontsize=8)
+save(fig, "fig6_nonlinear.pdf"); plt.close(fig)
 
 print("wrote fig6_nonlinear.pdf")
 for t in targets:
