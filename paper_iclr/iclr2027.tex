@@ -49,10 +49,11 @@ mouse's \emph{last-week} sessions with no loss on \emph{any} of the four events,
 accuracy is flat in the train--test day-gap ($\leq 0.038$ $\auc$ over two weeks)---to our knowledge
 the first longitudinal characterization of a cross-animal cortical decoder. Within a single animal
 the same design does resolve a small drift on the strongest event ($\approx 0.02$ $\auc$) that the
-cross-animal readout does not inherit. \textbf{(ii) Capacity-invariance} (lever-pull and lick):
-nonlinear temporal models (a 1-D CNN and a GRU over the evoked window) raise cross-animal $\auc$ by
-$+0.09$ to $+0.12$ while the cross-subject gap stays within a narrow $0.013$--$0.047$ band and does
-not systematically widen with capacity, so the shared structure includes the response
+cross-animal readout does not inherit. \textbf{(ii) Capacity-invariance:} nonlinear temporal models
+(a 1-D CNN and a GRU over the evoked window) raise cross-animal $\auc$ by $+0.02$ to $+0.12$---
+markedly for the two self-initiated movements, only slightly for the two cue-locked events---while
+the cross-subject gap stays within a narrow $0.004$--$0.047$ band and is \emph{smaller} than the
+linear model's in seven of eight comparisons, so the shared structure includes the response
 \emph{dynamics}, not only the linear evoked mean.
 \textbf{(iii) Replication and interpretability:} the effect reproduces on an independent
 widefield cohort (different lab, atlas, and task), and decoder weights localize to a shared
@@ -101,15 +102,15 @@ early sessions (days 1--5), it reads a held-out mouse's late sessions (days 11--
 and within-mouse accuracy is essentially flat in the train--test day-gap. We are not aware of a
 prior longitudinal characterization of a \emph{cross-animal} cortical decoder.
 \item \textbf{Capacity-invariance.} Nonlinear temporal decoders (1-D CNN, GRU) improve
-cross-animal $\auc$ substantially without systematically widening the cross-subject gap,
-indicating the shared component of the code encompasses the temporal response and not merely its
-collapsed mean. (Contribution (i) covers all four events; (ii) is established on lever-pull and
-lick.)
+cross-animal $\auc$ without systematically widening the cross-subject gap---it is in fact smaller
+than the linear model's in seven of eight comparisons---indicating the shared component of the code
+encompasses the temporal response and not merely its collapsed mean. The size of the gain
+dissociates by event type: large for self-initiated movements, small for cue-locked events.
 \item \textbf{Replication + interpretability.} The pattern reproduces on an independent widefield
 cohort, and the decoders localize to interpretable, partly target-specific cortex.
 \end{itemize}
 We are explicit (Section~\ref{sec:related}) that cross-animal \emph{conservation} of cortex-wide
-dynamics is already established and that a concurrent foundation-model preprint performs
+dynamics is already established and that a recently published foundation model performs
 atlas-aligned cross-subject decoding on this dataset; our aim is the complementary, interpretable,
 and longitudinally-controlled characterization those works do not provide.
 
@@ -317,26 +318,37 @@ $\auc$/day).}
 The linear baseline collapses each event to one evoked-difference vector, discarding temporal
 dynamics. A higher-capacity model could exploit those dynamics---but it could also overfit
 mouse-specific idiosyncrasies and \emph{open} a cross-animal gap. We test both by comparing the
-linear model to a 1-D CNN and a GRU over the full window on identical events and splits
-(Table~\ref{tab:nl}, Fig.~\ref{fig:nl}). Both temporal models raise absolute accuracy sharply:
-cross-animal $\auc$ rises from $0.804$ to $0.895$/$0.909$ (CNN/GRU) for lever-pull and from
-$0.850$ to $0.966$/$0.962$ for lick---a $+0.09$ to $+0.12$ gain, so the collapsed vector leaves
-real signal in the dynamics unused. Crucially, the cross-subject gap does not grow systematically
-with capacity: across all six model$\times$target combinations it stays within a narrow
-$0.013$--$0.047$ $\auc$ band, and in three of the four nonlinear-vs-linear comparisons it is
-\emph{smaller} than the linear model's (lick CNN $-0.013$ and GRU $-0.013$ vs.\ linear $-0.036$;
-lever-pull GRU $-0.026$ vs.\ linear $-0.037$). The single exception is the lever-pull CNN
-($-0.047$ vs.\ linear $-0.037$); we report this $0.010$ excess for completeness but do not
-interpret it, as we run no test comparing one model's gap against another's. The shared component
-of the code therefore includes the temporal response and not merely its collapsed mean: the
-temporal models buy $+0.09$--$0.12$ $\auc$ without a systematic cost in transfer.
+linear model to a 1-D CNN and a GRU over the full window on identical events and splits, for all
+four targets (Table~\ref{tab:nl}, Fig.~\ref{fig:nl}).
+
+Temporal models raise absolute accuracy, but by an amount that depends sharply on which event is
+decoded. The gain in cross-animal $\auc$ over the linear model is large for the two
+\emph{movement} events---lever-pull $0.804\!\to\!0.894$/$0.910$ (CNN/GRU) and lick
+$0.850\!\to\!0.966$/$0.967$, i.e.\ $+0.09$ to $+0.12$---but modest for the two \emph{cue-locked}
+events: reward $0.925\!\to\!0.944$/$0.958$ ($+0.019$/$+0.033$) and tone $0.828\!\to\!0.864$/$0.881$
+($+0.036$/$+0.053$). Across all eight the range is $+0.019$ to $+0.117$. The dissociation is
+interpretable---reward and tone are triggered by discrete external cues and evoke stereotyped
+responses that a collapsed evoked mean already captures well, whereas self-initiated movements
+carry richer temporal structure that the collapsed vector discards---but we did not predict it in
+advance and report it as an observation rather than a tested claim.
+
+Crucially, the cross-subject gap does not grow systematically with capacity. Across all twelve
+model$\times$target combinations it stays within a narrow $0.004$--$0.047$ $\auc$ band, and in
+\emph{seven of the eight} nonlinear-vs-linear comparisons it is \emph{smaller} than the linear
+model's---most clearly reward GRU ($-0.004$ vs.\ linear $-0.026$) and lick GRU ($-0.008$ vs.\
+$-0.036$). The single exception is the lever-pull CNN ($-0.047$ vs.\ linear $-0.037$); we report
+this $0.010$ excess for completeness but do not interpret it, as we run no test comparing one
+model's gap against another's. The shared component of the code therefore includes the temporal
+response and not merely its collapsed mean, and capacity buys accuracy without a systematic cost
+in transfer.
 
 \begin{table}[t]\centering
-\caption{Linear vs.\ nonlinear temporal decoders. Temporal models are far more accurate, yet the
-cross-subject gap (LOMO $-$ within) stays within $0.013$--$0.047$ and does not systematically
-exceed the linear model's (smaller in three of four comparisons; larger only for the lever-pull
-CNN, by $0.010$). Within-mouse and LOMO values are separate runs from the linear entries of
-Table~\ref{tab:main}, so they can differ in the third decimal.}
+\caption{Linear vs.\ nonlinear temporal decoders, all four targets, $n=25$ mice. Temporal models
+are more accurate, yet the cross-subject gap (LOMO $-$ within) stays within $0.004$--$0.047$ and
+does not systematically exceed the linear model's: it is \emph{smaller} in seven of the eight
+nonlinear-vs-linear comparisons, larger only for the lever-pull CNN (by $0.010$). Within-mouse and
+LOMO values are separate runs from the linear entries of Table~\ref{tab:main}, so they can differ
+in the third decimal.}
 \label{tab:nl}
 \begin{tabular}{llccc}
 \toprule
@@ -344,21 +356,32 @@ Target & Model & Within-mouse & LOMO & Gap \\
 \midrule
 \multirow{3}{*}{Lever-pull}
  & Linear (evoked)    & 0.841 & 0.804 & $-0.037$ \\
- & 1-D CNN (temporal) & 0.942 & 0.895 & $-0.047$ \\
- & GRU (temporal)     & 0.935 & 0.909 & $-0.026$ \\
+ & 1-D CNN (temporal) & 0.942 & 0.894 & $-0.047$ \\
+ & GRU (temporal)     & 0.934 & 0.910 & $-0.024$ \\
 \midrule
 \multirow{3}{*}{Lick}
- & Linear (evoked)    & 0.886 & 0.850 & $-0.036$ \\
- & 1-D CNN (temporal) & 0.978 & 0.966 & $-0.013$ \\
- & GRU (temporal)     & 0.975 & 0.962 & $-0.013$ \\
+ & Linear (evoked)    & 0.885 & 0.850 & $-0.036$ \\
+ & 1-D CNN (temporal) & 0.978 & 0.966 & $-0.012$ \\
+ & GRU (temporal)     & 0.974 & 0.967 & $-0.008$ \\
+\midrule
+\multirow{3}{*}{Reward}
+ & Linear (evoked)    & 0.951 & 0.925 & $-0.026$ \\
+ & 1-D CNN (temporal) & 0.962 & 0.944 & $-0.018$ \\
+ & GRU (temporal)     & 0.962 & 0.958 & $-0.004$ \\
+\midrule
+\multirow{3}{*}{Tone}
+ & Linear (evoked)    & 0.864 & 0.828 & $-0.036$ \\
+ & 1-D CNN (temporal) & 0.886 & 0.864 & $-0.022$ \\
+ & GRU (temporal)     & 0.896 & 0.881 & $-0.015$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.9\linewidth]{figs/fig6_nonlinear.pdf}
-\caption{Within-mouse vs.\ LOMO $\auc$ for the linear and two nonlinear temporal decoders.
-Capacity raises accuracy markedly but does not open a cross-animal gap.}
+\caption{Within-mouse vs.\ LOMO $\auc$ for the linear and two nonlinear temporal decoders, all
+four targets. Capacity raises accuracy---markedly for the movement events, only slightly for the
+cue-locked ones---without opening a cross-animal gap.}
 \label{fig:nl}\end{figure}
 
 \subsection{Cross-dataset replication and cortical localization}
@@ -402,9 +425,9 @@ chance.}
 \section{Discussion}
 On BraiDyn-BC, cortex-wide representations of all four task events generalize to unseen individuals
 within $0.03$--$0.04$ $\auc$ of within-animal decoding, and---our main contribution---that small
-gap is \emph{stable across a 15-day protocol for every event} and, on the two events we tested,
-\emph{does not widen with model capacity}. The one place time is resolvable is \emph{within} an
-animal (reward, $\approx0.02$ $\auc$), and notably the cross-animal readout does not inherit it.
+gap is \emph{stable across a 15-day protocol for every event} and \emph{does not widen with model
+capacity for any of them}. The one place time is resolvable is \emph{within} an animal (reward,
+$\approx0.02$ $\auc$), and notably the cross-animal readout does not inherit it.
 The shared component of the code is therefore invariant to
 individual identity, to session, and to whether the decoder is a 44-parameter linear map or a
 temporal network; and it includes the response dynamics, not only the collapsed evoked mean. That
@@ -416,11 +439,10 @@ lines do not provide.
 
 \textbf{Limitations.} We decode the four thresholdable task-event channels; continuous or graded
 behavioral variables are a natural next target, and are precisely where the cross-subject problem
-appears hardest \citep{wicat2026}. The longitudinal analysis (Section~\ref{sec:drift}) covers all
-four events, but the capacity analysis (Section~\ref{sec:nl}) is run on lever-pull and lick only,
-so whether reward and tone are equally capacity-invariant is untested. Our conclusions rest on
-LOMO-vs-within and across-vs-same-block \emph{comparisons} rather than absolute $\auc$, and they
-hold for both the linear and the nonlinear decoders. The residual cross-animal gap is small but non-zero: we
+appears hardest \citep{wicat2026}. Our conclusions rest on LOMO-vs-within and across-vs-same-block
+\emph{comparisons} rather than absolute $\auc$, and they hold for all four events and for both the
+linear and the nonlinear decoders. The movement/cue dissociation in how much capacity buys
+(Section~\ref{sec:nl}) is an unplanned observation on four events, not a tested hypothesis. The residual cross-animal gap is small but non-zero: we
 characterize rather than eliminate it. The longitudinal-novelty framing is, to the best of our
 literature search, unaddressed by prior work, but necessarily rests on absence of evidence.
 Finally, the drift literature we invoke as motivation \citep{rule2020} documents reorganization at
@@ -432,9 +454,9 @@ is stable---not as evidence against single-neuron drift, which we cannot observe
 \section{Conclusion}
 A strict leave-one-mouse-out analysis in a shared 44-parcel atlas space shows that cortex-wide
 widefield representations of four behavioral events are read out across unseen mice within
-$0.03$--$0.04$ $\auc$ of the within-animal ceiling, that this small cross-subject gap is stable
-across a two-week protocol for every event, and that it does not widen with decoder capacity on the
-two events we tested, with an independent-cohort replication. We release code and a streamed-feature pipeline that reproduces every number without
+$0.03$--$0.04$ $\auc$ of the within-animal ceiling, and that for every event this small cross-subject
+gap is stable across a two-week protocol and does not widen with decoder capacity, with an
+independent-cohort replication. We release code and a streamed-feature pipeline that reproduces every number without
 downloading raw imaging.
 
 \subsubsection*{Reproducibility statement}
