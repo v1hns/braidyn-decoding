@@ -23,13 +23,15 @@ def save(fig, name):
     for o in OUTS:
         fig.savefig(os.path.join(o, name))
 
-COND = [("WS_within_same", "within\nsame-block", "#95a5a6"),
-        ("WX_within_cross", "within\ncross-block", "#5d6d7e"),
-        ("LS_lomo_same", "LOMO\nsame-block", "#e08e79"),
-        ("LX_lomo_cross", "LOMO\ncross-block", "#c0392b")]
+# Short codes match the paper's Table 2 notation; long names collide once there
+# are four panels downscaled to \linewidth.
+COND = [("WS_within_same", "WS", "#95a5a6"),
+        ("WX_within_cross", "WX", "#5d6d7e"),
+        ("LS_lomo_same", "LS", "#e08e79"),
+        ("LX_lomo_cross", "LX", "#c0392b")]
 
 # Fig 4: 2x2 drift bars per target (WS/WX/LS/LX) with cluster-bootstrap CI + per-mouse dots
-fig, axes = plt.subplots(1, len(targets), figsize=(1.7 * len(targets) + 0.5, 2.8), sharey=True)
+fig, axes = plt.subplots(1, len(targets), figsize=(1.45 * len(targets) + 0.4, 2.6), sharey=True)
 for ax, t in zip(np.atleast_1d(axes), targets):
     d = R[t]["drift_2x2"]; x = np.arange(len(COND))
     aucs = [d[k]["auc"] for k, _, _ in COND]
@@ -41,16 +43,16 @@ for ax, t in zip(np.atleast_1d(axes), targets):
         vals = [pm[m][k[:2]] for m in pm if pm[m][k[:2]] == pm[m][k[:2]]]  # drop NaN
         ax.scatter([xi]*len(vals), vals, s=5, color="k", alpha=0.3, zorder=3)
     ax.axhline(0.5, ls="--", c="gray", lw=0.7)
-    ax.set_xticks(x); ax.set_xticklabels([lab for _, lab, _ in COND], fontsize=6)
-    ax.set_title(nice.get(t, t) + f"  (n={d['n_mice']} mice)")
-    ps = d["paired_LX_vs_LS"]
-    if ps:
-        ax.text(0.5, 0.04, f"LOMO cross - same = {ps['mean_LX_minus_LS']:+.3f}, p={ps['p_two_sided']:.2f}",
-                transform=ax.transAxes, ha="center", fontsize=6, color="#c0392b")
+    ax.set_xticks(x); ax.set_xticklabels([lab for _, lab, _ in COND], fontsize=7)
+    # Delta / p live in Table 2; annotating them here collided with the bars
+    # (ylim starts at 0.4, so low axes-coords text sits behind them).
+    ax.set_title(f"{nice.get(t, t)}  (n={d['n_mice']})", fontsize=8)
 np.atleast_1d(axes)[0].set_ylabel("decoding AUC")
 np.atleast_1d(axes)[0].set_ylim(0.4, 1.0)
-fig.suptitle("Cross-session drift: the conserved code is stable across ~2 weeks\n"
-             "(train EARLY days 1-5 -> test LATE days 11-15)", y=1.06, fontsize=8)
+fig.suptitle("Cross-session design: WS/WX = within-mouse same/early->late block, "
+             "LS/LX = leave-one-mouse-out same/early->late\n"
+             "The cross-animal pair (LS->LX) does not fall for any target",
+             y=1.07, fontsize=7)
 save(fig, "fig4_drift_2x2.pdf"); plt.close(fig)
 
 # Fig 5: within-mouse day-gap decay curve (AUC vs gap in days), both targets

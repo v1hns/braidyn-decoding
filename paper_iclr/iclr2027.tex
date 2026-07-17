@@ -43,13 +43,14 @@ leave-one-mouse-out (LOMO) protocol in the shared parcel space. A simple, interp
 decoder trained on $N{-}1$ mice reads every held-out mouse above chance for every event
 (LOMO $\auc$ $0.80$--$0.93$, permutation $p=0.007$), landing within $0.03$--$0.04$ $\auc$ of the
 within-animal ceiling---a small residual cross-subject gap. Our contributions are what this gap
-\emph{does}, not merely that it is small; we characterize it along two axes on the two
-highest-count events (lever-pull and lick). \textbf{(i) Longitudinal stability:} exploiting the
+\emph{does}, not merely that it is small. \textbf{(i) Longitudinal stability:} exploiting the
 15-day protocol, a decoder trained on \emph{other} mice's first-week sessions reads a held-out
-mouse's \emph{last-week} sessions with no additional loss, and within-mouse accuracy is flat in
-the train--test day-gap ($<0.04$ $\auc$ over two weeks)---to our knowledge the first longitudinal
-characterization of a cross-animal cortical decoder. \textbf{(ii) Capacity-invariance:} nonlinear
-temporal models (a 1-D CNN and a GRU over the evoked window) raise cross-animal $\auc$ by
+mouse's \emph{last-week} sessions with no loss on \emph{any} of the four events, and within-mouse
+accuracy is flat in the train--test day-gap ($\leq 0.038$ $\auc$ over two weeks)---to our knowledge
+the first longitudinal characterization of a cross-animal cortical decoder. Within a single animal
+the same design does resolve a small drift on the strongest event ($\approx 0.02$ $\auc$) that the
+cross-animal readout does not inherit. \textbf{(ii) Capacity-invariance} (lever-pull and lick):
+nonlinear temporal models (a 1-D CNN and a GRU over the evoked window) raise cross-animal $\auc$ by
 $+0.09$ to $+0.12$ while the cross-subject gap stays within a narrow $0.013$--$0.047$ band and does
 not systematically widen with capacity, so the shared structure includes the response
 \emph{dynamics}, not only the linear evoked mean.
@@ -95,15 +96,15 @@ decoder reads every held-out mouse above chance for all four events (LOMO $\auc$
 $p=0.007$), within $0.03$--$0.04$ $\auc$ of the within-animal ceiling. This is a small, honestly
 reported residual gap---not a claim of zero gap.
 \item \textbf{Longitudinal stability (primary result).} Using the 15-day protocol, we show the
-cross-animal decoder does not degrade over time: trained on other mice's early sessions
-(days 1--5), it reads a held-out mouse's late sessions (days 11--15) with no additional loss, and
-within-mouse accuracy is essentially flat in the train--test day-gap. We are not aware of a prior
-longitudinal characterization of a \emph{cross-animal} cortical decoder.
+cross-animal decoder does not degrade over time on any of the four events: trained on other mice's
+early sessions (days 1--5), it reads a held-out mouse's late sessions (days 11--15) with no loss,
+and within-mouse accuracy is essentially flat in the train--test day-gap. We are not aware of a
+prior longitudinal characterization of a \emph{cross-animal} cortical decoder.
 \item \textbf{Capacity-invariance.} Nonlinear temporal decoders (1-D CNN, GRU) improve
 cross-animal $\auc$ substantially without systematically widening the cross-subject gap,
 indicating the shared component of the code encompasses the temporal response and not merely its
-collapsed mean. (Contributions (i) and (ii) are established on lever-pull and lick, the two events
-with enough per-block trials to support the split.)
+collapsed mean. (Contribution (i) covers all four events; (ii) is established on lever-pull and
+lick.)
 \item \textbf{Replication + interpretability.} The pattern reproduces on an independent widefield
 cohort, and the decoders localize to interpretable, partly target-specific cortex.
 \end{itemize}
@@ -247,49 +248,68 @@ held-out mice). Cross-animal decoding approaches the within-animal ceiling---a s
 \subsection{Longitudinal stability of the cross-animal decoder}
 \label{sec:drift}
 Does the shared readout survive the passage of days? Using the four-regime design
-(Table~\ref{tab:drift}, Fig.~\ref{fig:drift}), we find it does. First, there is no detectable
-\emph{within}-animal drift: training on days 1--5 and testing on days 11--15 of the same mouse
-costs nothing measurable---lever-pull WX $0.838$ vs.\ WS $0.826$ (a slight gain) and lick $0.865$
-vs.\ $0.883$ (a $0.018$ dip); the two directions disagree and both sets of CIs overlap, so we read
-this as no reliable change rather than as evidence of drift.
-Second, and centrally, the \emph{cross-animal} decoder is temporally stable: trained only on other
-mice's first-week sessions and tested on a held-out mouse's \emph{last-week} sessions (LX), it
-equals or exceeds the same-block cross-animal control (LS)---lever-pull $0.818$ vs.\ $0.792$
-(paired $\Delta=+0.026$, sign-flip $p=0.008$, $n=25$) and lick $0.842$ vs.\ $0.832$ ($\Delta=+0.010$,
-$p=0.44$). In neither cross-animal comparison is the across-block decoder worse; the mildly
-positive direction is consistent with late-week behavior being more practiced and thus slightly
-cleaner, not with temporal degradation. Finally, a within-mouse train-day/test-day sweep ($>2300$ session pairs per
-target) shows accuracy is flat in the day-gap: slopes are $-0.0004$ (lever-pull) and $-0.0022$
-(lick) $\auc$/day, i.e.\ $<0.04$ $\auc$ lost across the entire two-week span
-(Fig.~\ref{fig:drift}, right). The cross-animal behavioral code is thus stable along \emph{both} the
-individual and the session axes.
+(Table~\ref{tab:drift}, Fig.~\ref{fig:drift}), run on all four targets, the cross-animal answer is
+yes; the within-animal picture is more nuanced, and we report both.
+
+\textbf{Within-animal.} Training on days 1--5 and testing on days 11--15 of the same mouse leaves
+lever-pull marginally better (WX $0.838$ vs.\ WS $0.826$) but costs a little on the other three
+(lick $0.865$ vs.\ $0.883$; tone $0.847$ vs.\ $0.860$; reward $0.939$ vs.\ $0.961$). For lick and
+tone the bootstrap CIs overlap, but for \emph{reward} they do not ($0.939\,[0.925,0.952]$ vs.\
+$0.961\,[0.955,0.967]$): on the cohort's strongest target there is a small but resolvable
+within-animal drift of $\approx 0.02$ $\auc$ over two weeks. We therefore do not claim that
+within-animal drift is absent---only that it is small, and that it does not propagate to the
+cross-animal readout.
+
+\textbf{Cross-animal.} Trained only on other mice's first-week sessions and tested on a held-out
+mouse's \emph{last-week} sessions (LX), the decoder equals or exceeds its same-block control (LS)
+for \emph{every} target: lever-pull $0.818$ vs.\ $0.792$ (paired $\Delta=+0.026$, sign-flip
+$p=0.009$, $n=25$), lick $0.842$ vs.\ $0.832$ ($+0.010$, $p=0.44$), reward $0.929$ vs.\ $0.919$
+($+0.010$, $p=0.29$), and tone $0.823$ vs.\ $0.813$ ($+0.010$, $p=0.55$). Only lever-pull is
+individually significant, so what we claim is the conjunction---all four differences are positive
+and none is negative---not an improvement. The mildly positive direction is consistent with
+late-week behavior being more practiced and thus slightly cleaner to decode.
+
+Where the two axes meet is informative: the cross-subject gap \emph{narrows} on late data exactly
+where within-animal drift is resolvable. For reward the within-minus-LOMO gap is $0.042$ on early
+sessions ($0.961$ vs.\ $0.919$) but $0.010$ on late ones ($0.939$ vs.\ $0.929$)---a mouse's own
+early-week decoder transfers to its own late-week data \emph{worse} than a decoder pooled over the
+other 24 mice does. This is consistent with the pooled model averaging out individual drift, but we
+have not tested that mechanism and report the observation only.
+
+Finally, a within-mouse train-day/test-day sweep ($>2300$ session pairs per target) shows accuracy
+is flat in the day-gap: slopes are $-0.0004$ (lever-pull), $-0.0022$ (lick), $-0.0025$ (reward) and
+$-0.0027$ (tone) $\auc$/day---at most $0.038$ $\auc$ across the entire two-week span
+(Fig.~\ref{fig:drift}, right).
 
 \begin{table}[t]\centering
-\caption{Longitudinal design: within/across-animal $\times$ same/across-block $\auc$. Training on
-days 1--5 and testing on days 11--15---within a mouse or across mice---incurs no loss.}
+\caption{Longitudinal design: within/across-animal $\times$ same/across-block $\auc$, all four
+targets, $n=25$ mice. Training on other mice's days 1--5 and testing a held-out mouse's days
+11--15 (LX) costs nothing relative to the same-block control (LS) for any target. Within a mouse
+(WX vs.\ WS) three of four targets dip slightly, and for reward the dip is resolvable.
+$\Delta$ is the paired LX$-$LS difference (sign-flip permutation).}
 \label{tab:drift}
-\begin{tabular}{lcccc}
+\begin{tabular}{lccccrc}
 \toprule
- & \multicolumn{2}{c}{within-mouse} & \multicolumn{2}{c}{leave-one-mouse-out} \\
+ & \multicolumn{2}{c}{within-mouse} & \multicolumn{2}{c}{leave-one-mouse-out} & \\
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}
-Target & same (WS) & early$\to$late (WX) & same (LS) & early$\to$late (LX) \\
+Target & same (WS) & early$\to$late (WX) & same (LS) & early$\to$late (LX) & $\Delta$ & $p$ \\
 \midrule
-Lever-pull & 0.826 & 0.838 & 0.792 & 0.818 \\
-Lick       & 0.883 & 0.865 & 0.832 & 0.842 \\
+Lever-pull & 0.826 & 0.838 & 0.792 & 0.818 & $+0.026$ & 0.009 \\
+Lick       & 0.883 & 0.865 & 0.832 & 0.842 & $+0.010$ & 0.44 \\
+Reward     & 0.961 & 0.939 & 0.919 & 0.929 & $+0.010$ & 0.29 \\
+Tone       & 0.860 & 0.847 & 0.813 & 0.823 & $+0.010$ & 0.55 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{figure}[t]\centering
-\begin{minipage}{0.56\linewidth}\centering
-\includegraphics[width=\linewidth]{figs/fig4_drift_2x2.pdf}
-\end{minipage}\hfill
-\begin{minipage}{0.42\linewidth}\centering
-\includegraphics[width=\linewidth]{figs/fig5_daygap.pdf}
-\end{minipage}
-\caption{\textbf{Left:} within/across-animal $\times$ same/across-block decoding (bootstrap CI;
-dots = mice); the conserved code is temporally stable. \textbf{Right:} within-mouse accuracy vs.\
-train--test day-gap is flat (slopes $-0.0004$ and $-0.0022$ $\auc$/day).}
+\includegraphics[width=\linewidth]{figs/fig4_drift_2x2.pdf}\\[6pt]
+\includegraphics[width=0.46\linewidth]{figs/fig5_daygap.pdf}
+\caption{\textbf{Top:} within/across-animal $\times$ same/across-block decoding for all four
+targets (bootstrap CI; dots = mice). The cross-animal pair (LOMO same-block vs.\ LOMO cross-block)
+does not fall for any target; the within-mouse pair dips for reward. \textbf{Bottom:} within-mouse
+accuracy vs.\ train--test day-gap is flat for every target (slopes $-0.0004$ to $-0.0027$
+$\auc$/day).}
 \label{fig:drift}\end{figure}
 
 \subsection{Capacity-invariance: the gap does not grow with model capacity}
@@ -381,10 +401,11 @@ chance.}
 
 \section{Discussion}
 On BraiDyn-BC, cortex-wide representations of all four task events generalize to unseen individuals
-within $0.03$--$0.04$ $\auc$ of within-animal decoding, and---our main contribution---for the two
-events we could test across blocks that small gap is \emph{stable across a 15-day protocol on both
-the within- and cross-animal axes} and \emph{does not widen with model capacity}. The shared
-component of the code is therefore invariant to
+within $0.03$--$0.04$ $\auc$ of within-animal decoding, and---our main contribution---that small
+gap is \emph{stable across a 15-day protocol for every event} and, on the two events we tested,
+\emph{does not widen with model capacity}. The one place time is resolvable is \emph{within} an
+animal (reward, $\approx0.02$ $\auc$), and notably the cross-animal readout does not inherit it.
+The shared component of the code is therefore invariant to
 individual identity, to session, and to whether the decoder is a 44-parameter linear map or a
 temporal network; and it includes the response dynamics, not only the collapsed evoked mean. That
 cortex-wide dynamics are conserved across individuals is not itself new
@@ -395,13 +416,11 @@ lines do not provide.
 
 \textbf{Limitations.} We decode the four thresholdable task-event channels; continuous or graded
 behavioral variables are a natural next target, and are precisely where the cross-subject problem
-appears hardest \citep{wicat2026}. Our two characterization results are narrower than the
-cross-sectional baseline: the longitudinal (Section~\ref{sec:drift}) and capacity
-(Section~\ref{sec:nl}) analyses are run on lever-pull and lick only---the two events with enough
-trials per mouse \emph{per block} to support an early/late split---so whether reward and tone are
-equally stable and equally capacity-invariant is untested. Our conclusions rest on LOMO-vs-within
-and across-vs-same-block \emph{comparisons} rather than absolute $\auc$, and they hold for both the
-linear and the nonlinear decoders. The residual cross-animal gap is small but non-zero: we
+appears hardest \citep{wicat2026}. The longitudinal analysis (Section~\ref{sec:drift}) covers all
+four events, but the capacity analysis (Section~\ref{sec:nl}) is run on lever-pull and lick only,
+so whether reward and tone are equally capacity-invariant is untested. Our conclusions rest on
+LOMO-vs-within and across-vs-same-block \emph{comparisons} rather than absolute $\auc$, and they
+hold for both the linear and the nonlinear decoders. The residual cross-animal gap is small but non-zero: we
 characterize rather than eliminate it. The longitudinal-novelty framing is, to the best of our
 literature search, unaddressed by prior work, but necessarily rests on absence of evidence.
 Finally, the drift literature we invoke as motivation \citep{rule2020} documents reorganization at
@@ -413,9 +432,9 @@ is stable---not as evidence against single-neuron drift, which we cannot observe
 \section{Conclusion}
 A strict leave-one-mouse-out analysis in a shared 44-parcel atlas space shows that cortex-wide
 widefield representations of four behavioral events are read out across unseen mice within
-$0.03$--$0.04$ $\auc$ of the within-animal ceiling, and that on the two events we could test
-across blocks this small cross-subject gap is stable across a two-week protocol and does not widen
-with decoder capacity, with an independent-cohort replication. We release code and a streamed-feature pipeline that reproduces every number without
+$0.03$--$0.04$ $\auc$ of the within-animal ceiling, that this small cross-subject gap is stable
+across a two-week protocol for every event, and that it does not widen with decoder capacity on the
+two events we tested, with an independent-cohort replication. We release code and a streamed-feature pipeline that reproduces every number without
 downloading raw imaging.
 
 \subsubsection*{Reproducibility statement}
