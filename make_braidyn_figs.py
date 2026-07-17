@@ -5,7 +5,16 @@ matplotlib.use("Agg"); import matplotlib.pyplot as plt
 plt.rcParams.update({"font.size": 8, "figure.dpi": 200, "savefig.bbox": "tight",
                      "axes.spines.top": False, "axes.spines.right": False})
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "paper", "figs"); os.makedirs(OUT, exist_ok=True)
+# Write into both paper dirs so the live ICLR draft and the archived IEEE one stay in sync.
+OUTS = [os.path.join(HERE, "paper_iclr", "figs"), os.path.join(HERE, "paper", "figs")]
+for _o in OUTS:
+    os.makedirs(_o, exist_ok=True)
+OUT = OUTS[0]
+
+
+def save(fig, name):
+    for o in OUTS:
+        fig.savefig(os.path.join(o, name))
 _j = os.path.join(HERE, "braidyn_4targets.json")
 if not os.path.exists(_j):
     # Never silently fall back to braidyn_results.json: that is the superseded single-session
@@ -57,9 +66,10 @@ for xi, t in zip(x, targets):
 ax.axhline(0.5, ls="--", c="gray", lw=0.7)
 ax.set_xticks(x); ax.set_xticklabels([nice.get(t, t) for t in targets])
 ax.set_ylabel("decoding AUC"); ax.set_ylim(0.4, 1.0)
-ax.set_title("Cross-mouse cortical decoding, 4 targets\n(every target conserved across mice; p=0.007)")
+ax.set_title("Cross-mouse cortical decoding, 4 targets\n"
+             "(every target above chance; small residual gap; p=0.007)")
 ax.legend(fontsize=6, loc="lower right")
-fig.savefig(f"{OUT}/fig1_auc.pdf"); plt.close(fig)
+save(fig, "fig1_auc.pdf"); plt.close(fig)
 
 # Fig 2: per-parcel importance (both targets), top parcels labeled
 fig, axes = plt.subplots(1, len(targets), figsize=(6.4, 2.6))
@@ -71,7 +81,7 @@ for ax, t in zip(np.atleast_1d(axes), targets):
     ax.set_yticklabels([names[i][:14] if i < len(names) else f"p{i}" for i in order], fontsize=6)
     ax.set_xlabel("|weight|"); ax.set_title(nice.get(t, t))
 fig.suptitle("Top cortical parcels driving the cross-mouse decoder", y=1.02, fontsize=8)
-fig.savefig(f"{OUT}/fig2_parcels.pdf"); plt.close(fig)
+save(fig, "fig2_parcels.pdf"); plt.close(fig)
 
 # Fig 3: per-mouse LOMO AUC spread
 fig, ax = plt.subplots(figsize=(3.2, 2.3))
@@ -81,7 +91,7 @@ for i, t in enumerate(targets):
 ax.axhline(0.5, ls="--", c="gray", lw=0.7)
 ax.set_xlabel("held-out mouse (sorted)"); ax.set_ylabel("LOMO AUC")
 ax.set_title("Every held-out mouse decodes"); ax.legend(fontsize=6)
-fig.savefig(f"{OUT}/fig3_permouse.pdf"); plt.close(fig)
+save(fig, "fig3_permouse.pdf"); plt.close(fig)
 
 print("parcel names sample:", names[:6])
 print("wrote:", sorted(os.listdir(OUT)))
