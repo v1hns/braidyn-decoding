@@ -16,7 +16,7 @@
 % --- ICLR-style running header (self-contained approximation of the official style) ---
 \pagestyle{fancy}\fancyhf{}
 \renewcommand{\headrulewidth}{0pt}
-\fancyhead[C]{\small Under review as a conference paper at ICLR 2026}
+\fancyhead[C]{\small Under review as a conference paper at ICLR 2027}
 \fancyfoot[C]{\small\thepage}
 
 \titleformat{\section}{\large\bfseries\raggedright}{\thesection}{0.6em}{\uppercase}
@@ -48,19 +48,22 @@ leave-one-mouse-out (LOMO) protocol in the shared parcel space. A simple, interp
 decoder trained on $N{-}1$ mice reads every held-out mouse above chance for every event
 (LOMO $\auc$ $0.80$--$0.93$, permutation $p=0.007$), landing within $0.03$--$0.04$ $\auc$ of the
 within-animal ceiling---a small residual cross-subject gap. Our contributions are what this gap
-\emph{does}, not merely that it is small. \textbf{(i) Longitudinal stability:} exploiting the
+\emph{does}, not merely that it is small; we characterize it along two axes on the two
+highest-count events (lever-pull and lick). \textbf{(i) Longitudinal stability:} exploiting the
 15-day protocol, a decoder trained on \emph{other} mice's first-week sessions reads a held-out
 mouse's \emph{last-week} sessions with no additional loss, and within-mouse accuracy is flat in
 the train--test day-gap ($<0.04$ $\auc$ over two weeks)---to our knowledge the first longitudinal
 characterization of a cross-animal cortical decoder. \textbf{(ii) Capacity-invariance:} nonlinear
 temporal models (a 1-D CNN and a GRU over the evoked window) raise cross-animal $\auc$ by
-$+0.09$ to $+0.12$ yet leave the cross-subject gap no larger than the linear model's, so the
-shared structure includes the response \emph{dynamics}, not only the linear evoked mean.
+$+0.09$ to $+0.12$ while the cross-subject gap stays within a narrow $0.013$--$0.047$ band and does
+not systematically widen with capacity, so the shared structure includes the response
+\emph{dynamics}, not only the linear evoked mean.
 \textbf{(iii) Replication and interpretability:} the effect reproduces on an independent
 widefield cohort (different lab, atlas, and task), and decoder weights localize to a shared
 midline retrosplenial/visual-association backbone with target-specific somatosensory and motor
-modulation. We position these results relative to concurrent atlas-aligned foundation-model work,
-which they complement with an interpretable, near-ceiling, longitudinally-controlled baseline.
+modulation. We position these results relative to recently published atlas-aligned
+foundation-model work, which they complement with an interpretable, near-ceiling,
+longitudinally-controlled baseline.
 Code and a streamed-feature pipeline (no raw-video download) are released.
 \end{abstract}
 
@@ -102,8 +105,10 @@ cross-animal decoder does not degrade over time: trained on other mice's early s
 within-mouse accuracy is essentially flat in the train--test day-gap. We are not aware of a prior
 longitudinal characterization of a \emph{cross-animal} cortical decoder.
 \item \textbf{Capacity-invariance.} Nonlinear temporal decoders (1-D CNN, GRU) improve
-cross-animal $\auc$ substantially but do not widen the cross-subject gap, indicating the shared
-component of the code encompasses the temporal response and not merely its collapsed mean.
+cross-animal $\auc$ substantially without systematically widening the cross-subject gap,
+indicating the shared component of the code encompasses the temporal response and not merely its
+collapsed mean. (Contributions (i) and (ii) are established on lever-pull and lick, the two events
+with enough per-block trials to support the split.)
 \item \textbf{Replication + interpretability.} The pattern reproduces on an independent widefield
 cohort, and the decoders localize to interpretable, partly target-specific cortex.
 \end{itemize}
@@ -114,18 +119,28 @@ and longitudinally-controlled characterization those works do not provide.
 
 \section{Related work}
 \label{sec:related}
-\textbf{Concurrent cross-subject widefield modeling.} Most directly related, a concurrent preprint
-(WiCAT; \citealp{wicat2026}) learns atlas-aligned, subject-invariant representations of widefield
-imaging and performs \emph{zero-shot} cross-subject behavior decoding on the same
-Kondo/BraiDyn-BC dataset, using a self-supervised foundation model over learned spatiotemporal
-patch tokens registered to the Allen CCF. Our work is complementary in three concrete ways: (a)
-we decode in the interpretable 44-parcel atlas space with a simple linear/CNN/GRU LOMO protocol
-rather than a learned-token foundation model; (b) our cross-animal transfer is near the
-within-animal ceiling on discrete events, whereas the reported zero-shot foundation-model transfer
-is well above chance but modest; and (c) neither longitudinal stability nor capacity-invariance of
-cross-subject transfer is characterized there. We therefore do not claim priority on the concept
-of cross-subject widefield decoding; we contribute an interpretable, near-ceiling, and
-time-controlled account.
+\textbf{Cross-subject widefield modeling.} Most directly related, WiCAT \citep{wicat2026}
+learns atlas-aligned, subject-invariant representations of widefield imaging and performs
+\emph{zero-shot} cross-subject behavior decoding on the same Kondo/BraiDyn-BC cohort (25 mice,
+352 sessions), alongside a second (Musall) cohort, using self-supervised pretraining over
+spatiotemporal tokens registered to the Allen CCF without session-specific components. It
+establishes that cross-subject widefield decoding is achievable, and we accordingly claim no
+priority on that concept. Our contribution is complementary along three concrete axes.
+(a) \emph{Representation.} We decode in the interpretable 44-parcel atlas space with a simple
+linear/CNN/GRU LOMO protocol rather than a learned-token foundation model, so the fitted weights
+are directly readable as cortical anatomy (Section~\ref{sec:repl}).
+(b) \emph{Target and metric.} WiCAT decodes \emph{continuous} behavior on held-out subjects
+(reported zero-shot Kondo $R^2=0.18$ under linear probing, $0.29$ with a Kalman decoder), whereas
+we decode \emph{discrete} task events and report $\auc$. These quantities measure different
+prediction problems under different metrics and are \emph{not} directly comparable; we make no
+claim of outperforming WiCAT. Read together they are nonetheless suggestive---near-ceiling
+cross-animal $\auc$ on discrete events alongside modest zero-shot $R^2$ on continuous
+trajectories hints that the individual-invariant component of the code carries event structure
+more readily than moment-to-moment behavioral detail---though because architecture, supervision,
+and metric all differ simultaneously, we offer this as a conjecture for future controlled work
+rather than a result.
+(c) \emph{Uncharacterized axes.} Neither longitudinal stability nor capacity-invariance of
+cross-subject transfer is examined there; those are our contributions (i) and (ii).
 
 \textbf{Conservation of cortex-wide dynamics.} That cortex-wide activity is shared across
 individuals is established. \citet{macdowell2020,macdowell2024} show a small set of cortex-wide
@@ -200,8 +215,10 @@ and LOMO splits.
 All four task events decode from the cortex-wide response of a \emph{never-seen} mouse well above
 chance (Table~\ref{tab:main}, Fig.~\ref{fig:auc}): LOMO $\auc$ ranges $0.804$ (lever-pull) to
 $0.926$ (reward), all at permutation $p=0.007$ (the resolution floor of 150 permutations), with
-bootstrap lower bounds $\geq 0.78$. Every held-out mouse decodes above chance for every target
-(Fig.~\ref{fig:parcels}, bottom). Cross-animal decoding lands within $0.03$--$0.04$ $\auc$ of the
+bootstrap lower bounds $\geq 0.78$. Every one of the 25 held-out mice exceeds chance for every
+target, with no per-mouse $\auc$ below $0.65$ (minima $0.653$ lever-pull, $0.661$ lick, $0.811$
+reward, $0.697$ tone; Fig.~\ref{fig:parcels}, bottom)---these are point estimates, as we do not
+run a per-mouse significance test. Cross-animal decoding lands within $0.03$--$0.04$ $\auc$ of the
 within-animal ceiling for all four events (e.g.\ lever-pull $0.804$ vs.\ $0.842$; reward $0.926$
 vs.\ $0.953$). Because the pooled cross-animal decoder is estimated from $\sim$24$\times$ more
 data than any single-mouse model, and the within-mouse controls here are themselves well powered
@@ -235,16 +252,18 @@ held-out mice). Cross-animal decoding approaches the within-animal ceiling---a s
 \subsection{Longitudinal stability of the cross-animal decoder}
 \label{sec:drift}
 Does the shared readout survive the passage of days? Using the four-regime design
-(Table~\ref{tab:drift}, Fig.~\ref{fig:drift}), we find it does. First, there is no
+(Table~\ref{tab:drift}, Fig.~\ref{fig:drift}), we find it does. First, there is no detectable
 \emph{within}-animal drift: training on days 1--5 and testing on days 11--15 of the same mouse
-loses nothing (lever-pull WX $0.838$ vs.\ WS $0.826$; lick $0.865$ vs.\ $0.883$; CIs overlap).
+costs nothing measurable---lever-pull WX $0.838$ vs.\ WS $0.826$ (a slight gain) and lick $0.865$
+vs.\ $0.883$ (a $0.018$ dip); the two directions disagree and both sets of CIs overlap, so we read
+this as no reliable change rather than as evidence of drift.
 Second, and centrally, the \emph{cross-animal} decoder is temporally stable: trained only on other
 mice's first-week sessions and tested on a held-out mouse's \emph{last-week} sessions (LX), it
 equals or exceeds the same-block cross-animal control (LS)---lever-pull $0.818$ vs.\ $0.792$
 (paired $\Delta=+0.026$, sign-flip $p=0.008$, $n=25$) and lick $0.842$ vs.\ $0.832$ ($\Delta=+0.010$,
-$p=0.45$). In no regime is the across-block decoder worse; the mildly positive direction is
-consistent with late-week behavior being more practiced and thus slightly cleaner, not with
-temporal degradation. Finally, a within-mouse train-day/test-day sweep ($>2300$ session pairs per
+$p=0.44$). In neither cross-animal comparison is the across-block decoder worse; the mildly
+positive direction is consistent with late-week behavior being more practiced and thus slightly
+cleaner, not with temporal degradation. Finally, a within-mouse train-day/test-day sweep ($>2300$ session pairs per
 target) shows accuracy is flat in the day-gap: slopes are $-0.0004$ (lever-pull) and $-0.0022$
 (lick) $\auc$/day, i.e.\ $<0.04$ $\auc$ lost across the entire two-week span
 (Fig.~\ref{fig:drift}, right). The cross-animal behavioral code is thus stable along \emph{both} the
@@ -287,24 +306,29 @@ linear model to a 1-D CNN and a GRU over the full window on identical events and
 (Table~\ref{tab:nl}, Fig.~\ref{fig:nl}). Both temporal models raise absolute accuracy sharply:
 cross-animal $\auc$ rises from $0.804$ to $0.895$/$0.909$ (CNN/GRU) for lever-pull and from
 $0.850$ to $0.966$/$0.962$ for lick---a $+0.09$ to $+0.12$ gain, so the collapsed vector leaves
-real signal in the dynamics unused. Crucially, the cross-subject gap does \emph{not} widen: LOMO
-trails within-mouse by only $0.03$--$0.05$ $\auc$ for every model---no more for the high-capacity
-temporal networks than for the linear one, and less for lick ($-0.013$ vs.\ $-0.036$). The shared
-component of the code therefore includes the temporal response, not merely its mean; capacity buys
-accuracy without costing transfer. (In this pooled-session regime a small gap is present even for
-the linear model because within-mouse CV benefits from more per-mouse data than the single-session
-analysis of Table~\ref{tab:main}; the point is that capacity does not enlarge it.)
+real signal in the dynamics unused. Crucially, the cross-subject gap does not grow systematically
+with capacity: across all six model$\times$target combinations it stays within a narrow
+$0.013$--$0.047$ $\auc$ band, and in three of the four nonlinear-vs-linear comparisons it is
+\emph{smaller} than the linear model's (lick CNN $-0.013$ and GRU $-0.013$ vs.\ linear $-0.036$;
+lever-pull GRU $-0.026$ vs.\ linear $-0.037$). The single exception is the lever-pull CNN
+($-0.047$ vs.\ linear $-0.037$); we report this $0.010$ excess for completeness but do not
+interpret it, as we run no test comparing one model's gap against another's. The shared component
+of the code therefore includes the temporal response and not merely its collapsed mean: the
+temporal models buy $+0.09$--$0.12$ $\auc$ without a systematic cost in transfer.
 
 \begin{table}[t]\centering
 \caption{Linear vs.\ nonlinear temporal decoders. Temporal models are far more accurate, yet the
-cross-subject gap (LOMO $-$ within) is no larger than the linear model's.}
+cross-subject gap (LOMO $-$ within) stays within $0.013$--$0.047$ and does not systematically
+exceed the linear model's (smaller in three of four comparisons; larger only for the lever-pull
+CNN, by $0.010$). Within-mouse and LOMO values are separate runs from the linear entries of
+Table~\ref{tab:main}, so they can differ in the third decimal.}
 \label{tab:nl}
 \begin{tabular}{llccc}
 \toprule
 Target & Model & Within-mouse & LOMO & Gap \\
 \midrule
 \multirow{3}{*}{Lever-pull}
- & Linear (evoked)    & 0.842 & 0.804 & $-0.037$ \\
+ & Linear (evoked)    & 0.841 & 0.804 & $-0.037$ \\
  & 1-D CNN (temporal) & 0.942 & 0.895 & $-0.047$ \\
  & GRU (temporal)     & 0.935 & 0.909 & $-0.026$ \\
 \midrule
@@ -331,14 +355,21 @@ $\auc$ $0.731$ (within-mouse $0.744$) and arousal (pupil) $0.627$ (within $0.645
 near-ceiling cross-animal readout (gap $0.01$--$0.02$) appears across a different lab, atlas, task,
 and behavioral variable, indicating a general property of cortex rather than a cohort artifact.
 
-\textbf{Localization.} Decoder weights (Fig.~\ref{fig:parcels}) are spatially structured and
-dominated by high-amplitude midline cortex---retrosplenial (RSPagl, RSPd) and posterior
-visual-association/parietal areas (VISam, VISa)---shared across all four targets, as expected when
-a movement/arousal-related component pervades widefield activity \citep{musall2019}. Target
-identity modulates the finer weighting: the tone (auditory-cue) and lick decoders additionally
-recruit somatosensory (nose, upper-limb; SSp) and motor parcels that the reward decoder does not.
-The codes thus carry target-specific structure over a shared backbone rather than being pure
-generic arousal.
+\textbf{Localization.} Decoder weights (Fig.~\ref{fig:parcels}) are spatially structured. Ranking
+parcels by standardized-weight magnitude, exactly three of the 44 appear in the top eight of
+\emph{all four} targets: retrosplenial agranular cortex (RSPagl, left) and anteromedial
+visual-association cortex (VISam, bilaterally)---a compact midline retrosplenial/visual-association
+backbone, as expected when a movement/arousal-related component pervades widefield activity
+\citep{musall2019}. Target identity modulates the remainder: the tone (auditory-cue) decoder
+uniquely recruits nose and upper-limb somatosensory cortex (SSp\_n, SSp\_ul) together with motor
+cortex (MOp); the lick decoder recruits lower-limb somatosensory cortex bilaterally (SSp\_ll); and
+the reward decoder recruits neither, its top parcels being the shared backbone plus posterior
+parietal (VISa), dorsal retrosplenial (RSPd), and barrel cortex (SSp\_bfd). The codes thus carry
+target-specific structure over a shared backbone rather than being pure generic arousal---though
+we note the somatosensory subfields that separate the targets are not the ones a naive somatotopy
+of each action would predict, so we report the dissociation without interpreting its anatomy.
+Parcel names are read from the dataset's own ROI table and released as
+\texttt{parcel\_names.json}.
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.92\linewidth]{figs/fig2_parcels.pdf}\\[4pt]
@@ -351,37 +382,52 @@ chance.}
 
 \section{Discussion}
 On BraiDyn-BC, cortex-wide representations of all four task events generalize to unseen individuals
-within $0.03$--$0.04$ $\auc$ of within-animal decoding, and---our main contribution---that small
-gap is \emph{stable across a 15-day protocol on both the within- and cross-animal axes} and
-\emph{invariant to model capacity}. The shared component of the code is therefore invariant to
+within $0.03$--$0.04$ $\auc$ of within-animal decoding, and---our main contribution---for the two
+events we could test across blocks that small gap is \emph{stable across a 15-day protocol on both
+the within- and cross-animal axes} and \emph{does not widen with model capacity}. The shared
+component of the code is therefore invariant to
 individual identity, to session, and to whether the decoder is a 44-parameter linear map or a
 temporal network; and it includes the response dynamics, not only the collapsed evoked mean. That
 cortex-wide dynamics are conserved across individuals is not itself new
-\citep{macdowell2020,macdowell2024,musall2019}, and a concurrent foundation model performs
+\citep{macdowell2020,macdowell2024,musall2019}, and a recently published foundation model performs
 atlas-aligned cross-subject decoding on this cohort \citep{wicat2026}; our contribution is the
 interpretable, near-ceiling, and longitudinally- and capacity-controlled characterization those
 lines do not provide.
 
 \textbf{Limitations.} We decode the four thresholdable task-event channels; continuous or graded
-behavioral variables are a natural next target. Our conclusions rest on LOMO-vs-within and
-across-vs-same-block \emph{comparisons} rather than absolute $\auc$, and they hold for both the
+behavioral variables are a natural next target, and are precisely where the cross-subject problem
+appears hardest \citep{wicat2026}. Our two characterization results are narrower than the
+cross-sectional baseline: the longitudinal (Section~\ref{sec:drift}) and capacity
+(Section~\ref{sec:nl}) analyses are run on lever-pull and lick only---the two events with enough
+trials per mouse \emph{per block} to support an early/late split---so whether reward and tone are
+equally stable and equally capacity-invariant is untested. Our conclusions rest on LOMO-vs-within
+and across-vs-same-block \emph{comparisons} rather than absolute $\auc$, and they hold for both the
 linear and the nonlinear decoders. The residual cross-animal gap is small but non-zero: we
 characterize rather than eliminate it. The longitudinal-novelty framing is, to the best of our
-literature search, unaddressed by prior work, but rests on absence of evidence; and the WiCAT
-comparison is to a concurrent, non-archival preprint whose numbers may change.
+literature search, unaddressed by prior work, but necessarily rests on absence of evidence.
+Finally, the drift literature we invoke as motivation \citep{rule2020} documents reorganization at
+the \emph{single-neuron} level, whereas our signal is a mesoscale average over large populations
+within each parcel; such averaging may attenuate single-cell drift, so our stability result should
+be read as establishing that the \emph{parcel-level} code a cross-animal decoder actually consumes
+is stable---not as evidence against single-neuron drift, which we cannot observe here.
 
 \section{Conclusion}
 A strict leave-one-mouse-out analysis in a shared 44-parcel atlas space shows that cortex-wide
 widefield representations of four behavioral events are read out across unseen mice within
-$0.03$--$0.04$ $\auc$ of the within-animal ceiling, and that this small cross-subject gap is
-stable across a two-week protocol and invariant to decoder capacity, with an independent-cohort
-replication. We release code and a streamed-feature pipeline that reproduces every number without
+$0.03$--$0.04$ $\auc$ of the within-animal ceiling, and that on the two events we could test
+across blocks this small cross-subject gap is stable across a two-week protocol and does not widen
+with decoder capacity, with an independent-cohort replication. We release code and a streamed-feature pipeline that reproduces every number without
 downloading raw imaging.
 
 \subsubsection*{Reproducibility statement}
 All data are open (BraiDyn-BC, DANDI:001425, CC-BY; Cardin--Higley, figshare 175317). We release
-the full analysis code and a streaming feature pipeline that reproduces every table and figure
-from the public parcellated traces without downloading raw widefield movies; all splits,
+the full analysis code and a streaming feature pipeline: every BraiDyn-BC table and figure is
+reproduced from the public parcellated traces without downloading raw widefield movies, and the
+committed result files (\texttt{braidyn\_4targets.json}, \texttt{braidyn\_drift.json},
+\texttt{braidyn\_nonlinear.json}) carry every reported value together with per-mouse breakdowns
+and the 44-parcel ROI table. The independent-cohort replication of Section~\ref{sec:repl} is the
+one analysis that is not streamed: it requires the Cardin--Higley parcel-trace archive to be
+fetched from figshare first, and re-running it emits \texttt{cardin\_results.json}. All splits,
 permutation seeds, and model hyperparameters are specified in Section 3 and the released code.
 
 \bibliographystyle{plainnat}
@@ -412,9 +458,10 @@ neural population. \emph{eLife}, 9:e51121, 2020.
 \bibitem[Schneider et al.(2023)]{schneider2023} S.~Schneider, J.~H.~Lee, and M.~W.~Mathis.
 Learnable latent embeddings for joint behavioural and neural analysis (CEBRA). \emph{Nature},
 617:360--368, 2023.
-\bibitem[Hosseini et al.(2026)]{wicat2026} S.~Hosseini et al. WiCAT: cross-subject modeling for
-widefield calcium imaging via atlas-aligned spatiotemporal tokenization. \emph{arXiv preprint}
-arXiv:2607.09754, 2026.
+\bibitem[Hosseini et al.(2026)]{wicat2026} M.~Hosseini, E.~Erturk, S.~Hashemi, and
+M.~M.~Shanechi. Cross-subject modeling for widefield calcium imaging via atlas-aligned
+spatiotemporal tokenization. In \emph{Proceedings of the 43rd International Conference on Machine
+Learning (ICML)}, 2026. arXiv:2607.09754.
 \end{thebibliography}
 
 \end{document}

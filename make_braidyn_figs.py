@@ -8,12 +8,18 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "paper", "figs"); os.makedirs(OUT, exist_ok=True)
 _j = os.path.join(HERE, "braidyn_4targets.json")
 if not os.path.exists(_j):
-    _j = os.path.expanduser("~/braidyn_results.json")
+    # Never silently fall back to braidyn_results.json: that is the superseded single-session
+    # pilot (23/22 mice, one sub-chance per-mouse AUC) and figures built from it would not
+    # match the paper.
+    raise SystemExit(f"missing {_j} -- build figures from the 4-target study only")
 R = json.load(open(_j))
 
 
 def parcel_names():
-    """try to pull 44 Allen-parcel names from one NWB ImageSegmentation; else index labels."""
+    """44 Allen-parcel names: prefer the committed ROI table, else pull from NWB."""
+    p = os.path.join(HERE, "parcel_names.json")
+    if os.path.exists(p):
+        return json.load(open(p))
     try:
         import remfile, h5py, pynwb
         from dandi.dandiapi import DandiAPIClient
