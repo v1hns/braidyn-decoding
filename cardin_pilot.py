@@ -52,6 +52,7 @@ def windows(img, sig, hi_is_state=True, win=15):
 
 
 def main():
+    import json
     from sklearn.linear_model import LogisticRegression
     from sklearn.preprocessing import StandardScaler
     from sklearn.pipeline import make_pipeline
@@ -62,6 +63,7 @@ def main():
     # first-file key probe
     if files:
         _, _, _, _, keys = load(files[0]); print("mat keys:", keys)
+    out = {}
     for target_name, sel in [("movement(wheel)", "wheel"), ("arousal(pupil)", "pupil")]:
         Xall, yall, g = [], [], []
         for ai, f in enumerate(files):
@@ -104,6 +106,17 @@ def main():
         lomo = float(np.mean(list(per.values())))
         print(f"  within-mouse (block-CV) AUC: {np.mean(wm):.3f} +/- {np.std(wm):.3f} (n={len(wm)})")
         print(f"  LEAVE-ONE-MOUSE-OUT AUC: {lomo:.3f} | per-mouse {per}")
+        # Persist a result artifact: the paper's replication paragraph must be checkable
+        # against a committed file, not only against console output.
+        out[sel] = {"target": target_name, "n_mice": len(set(g)), "n_parcels": int(X.shape[1]),
+                    "n_windows": int(X.shape[0]),
+                    "within_mouse_auc": float(np.mean(wm)), "within_mouse_sd": float(np.std(wm)),
+                    "n_within": len(wm), "lomo_auc": lomo, "lomo_per_mouse": per,
+                    "gap_lomo_minus_within": lomo - float(np.mean(wm))}
+    here = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(here, "cardin_results.json"), "w") as fh:
+        json.dump(out, fh, indent=1)
+    print("saved cardin_results.json")
     print("CARDIN_DONE")
 
 
