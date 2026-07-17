@@ -23,10 +23,13 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 socket.setdefaulttimeout(90)
-TARGETS = ["state_lever", "lick"]
+TARGETS = ["state_lever", "lick", "reward", "tone"]
 PRE, POST = 0.5, 1.0          # window seconds
 A_FR, B_FR = 15, 30           # FIXED pre/post frame counts (dataset is ~30 Hz) -> constant L=45
-CACHE = "/home/ubuntu/nl_windows.npz"
+HERE = os.path.dirname(os.path.abspath(__file__))
+# Cache is keyed by the target set: it stores windows for TARGETS only, so reusing a
+# 2-target cache for a 4-target run would silently drop reward/tone.
+CACHE = os.path.join(HERE, f"nl_windows_{'_'.join(TARGETS)}.npz")
 
 
 # ---------- data access ----------
@@ -302,8 +305,9 @@ def main():
             rk = r[k]
             print(f"  {k:6s} within {rk['within_auc']:.3f}  LOMO {rk['lomo_auc']:.3f}  "
                   f"gap {rk['gap_lomo_minus_within']:+.3f} (p={rk['gap_p']:.3f})", flush=True)
-    json.dump(out, open("/home/ubuntu/braidyn_nonlinear.json", "w"), indent=1)
-    print("\nsaved braidyn_nonlinear.json\nBRAIDYN_NL_DONE", flush=True)
+    dest = os.path.join(HERE, "braidyn_nonlinear.json")
+    json.dump(out, open(dest, "w"), indent=1)
+    print(f"\nsaved {dest}\nBRAIDYN_NL_DONE", flush=True)
 
 
 if __name__ == "__main__":
