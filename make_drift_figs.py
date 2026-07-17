@@ -5,12 +5,23 @@ matplotlib.use("Agg"); import matplotlib.pyplot as plt
 plt.rcParams.update({"font.size": 8, "figure.dpi": 200, "savefig.bbox": "tight",
                      "axes.spines.top": False, "axes.spines.right": False})
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "paper", "figs"); os.makedirs(OUT, exist_ok=True)
+# Write into both paper dirs so the live ICLR draft and the archived IEEE one stay in sync.
+OUTS = [os.path.join(HERE, "paper_iclr", "figs"), os.path.join(HERE, "paper", "figs")]
+for _o in OUTS:
+    os.makedirs(_o, exist_ok=True)
+OUT = OUTS[0]
 JSON = os.path.join(HERE, "braidyn_drift.json")
 if not os.path.exists(JSON):
     JSON = os.path.expanduser("~/braidyn_drift.json")
 R = json.load(open(JSON))["targets"]
-targets = list(R.keys()); nice = {"state_lever": "lever-pull", "lick": "lick"}
+ORDER = ["state_lever", "lick", "reward", "tone"]
+targets = [t for t in ORDER if t in R] + [t for t in R if t not in ORDER]
+nice = {"state_lever": "lever-pull", "lick": "lick", "reward": "reward", "tone": "tone"}
+
+
+def save(fig, name):
+    for o in OUTS:
+        fig.savefig(os.path.join(o, name))
 
 COND = [("WS_within_same", "within\nsame-block", "#95a5a6"),
         ("WX_within_cross", "within\ncross-block", "#5d6d7e"),
@@ -18,7 +29,7 @@ COND = [("WS_within_same", "within\nsame-block", "#95a5a6"),
         ("LX_lomo_cross", "LOMO\ncross-block", "#c0392b")]
 
 # Fig 4: 2x2 drift bars per target (WS/WX/LS/LX) with cluster-bootstrap CI + per-mouse dots
-fig, axes = plt.subplots(1, len(targets), figsize=(6.6, 2.8), sharey=True)
+fig, axes = plt.subplots(1, len(targets), figsize=(1.7 * len(targets) + 0.5, 2.8), sharey=True)
 for ax, t in zip(np.atleast_1d(axes), targets):
     d = R[t]["drift_2x2"]; x = np.arange(len(COND))
     aucs = [d[k]["auc"] for k, _, _ in COND]
@@ -36,10 +47,11 @@ for ax, t in zip(np.atleast_1d(axes), targets):
     if ps:
         ax.text(0.5, 0.04, f"LOMO cross - same = {ps['mean_LX_minus_LS']:+.3f}, p={ps['p_two_sided']:.2f}",
                 transform=ax.transAxes, ha="center", fontsize=6, color="#c0392b")
-axes[0].set_ylabel("decoding AUC"); axes[0].set_ylim(0.4, 1.0)
+np.atleast_1d(axes)[0].set_ylabel("decoding AUC")
+np.atleast_1d(axes)[0].set_ylim(0.4, 1.0)
 fig.suptitle("Cross-session drift: the conserved code is stable across ~2 weeks\n"
              "(train EARLY days 1-5 -> test LATE days 11-15)", y=1.06, fontsize=8)
-fig.savefig(f"{OUT}/fig4_drift_2x2.pdf"); plt.close(fig)
+save(fig, "fig4_drift_2x2.pdf"); plt.close(fig)
 
 # Fig 5: within-mouse day-gap decay curve (AUC vs gap in days), both targets
 fig, ax = plt.subplots(figsize=(3.4, 2.5))
@@ -53,7 +65,7 @@ ax.set_xlabel("days between train and test session")
 ax.set_ylabel("within-mouse AUC"); ax.set_ylim(0.4, 1.0)
 ax.set_title("Within-mouse decoding vs day-gap")
 ax.legend(fontsize=6, loc="lower left")
-fig.savefig(f"{OUT}/fig5_daygap.pdf"); plt.close(fig)
+save(fig, "fig5_daygap.pdf"); plt.close(fig)
 
 print("wrote:", sorted(os.listdir(OUT)))
 for t in targets:
