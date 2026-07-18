@@ -96,15 +96,24 @@ recalibration. We release code and a no-raw-download streaming pipeline.
 \section{Related work}
 \textbf{Representational drift and its mitigation.} Drift is characterized within a single
 subject \citep{rule2020,driscoll2017,schoonover2021,rule2019}, and the engineering response is
-within-subject recalibration or latent re-alignment \citep{degenhart2020,jarosiewicz2015,farshchian2019}.
-These methods stabilize a decoder using \emph{that subject's} later data; none uses a population of
-\emph{other} subjects as the source of stability, which is our question.
+within-subject recalibration or latent re-alignment: manifold stabilization
+\citep{degenhart2020}, supervised and self-calibrating recalibration
+\citep{jarosiewicz2015,wilson2025}, adversarial and nonlinear latent-dynamics alignment to the
+subject's own reference day \citep{farshchian2019,karpowicz2025}. Every one of these stabilizes a
+decoder using \emph{that subject's} own later data; none uses a population of \emph{other} subjects
+as the source of stability, which is our question.
 
 \textbf{Cross-subject decoding.} Shared structure across individuals supports cross-subject readout
 via manifold alignment \citep{melbaum2022}, contrastive embeddings \citep{schneider2023}, and, on
-this very cohort, atlas-aligned foundation models \citep{wicat2026}. These target accuracy/transfer
-at a fixed time; the temporal-robustness question---whether the pooled decoder \emph{ages} more
-slowly---is orthogonal and unaddressed.
+this very cohort, atlas-aligned foundation models \citep{wicat2026}. Pooling across participants is
+also known to \emph{reduce overfitting}: HTNet trains one decoder on pooled multi-participant data
+precisely to ``avoid overfit decoders'' from single-subject data scarcity \citep{peterson2021}. Two
+things separate that line from ours. First, the overfitting it avoids is \emph{sample-size}
+overfitting (too little data per subject), whereas our count-matched control holds training-set size
+fixed and still finds the effect, so the overfitting we implicate is to the subject's
+\emph{drift-prone} features rather than to small samples. Second, and more basically, all of these
+target accuracy/transfer at a \emph{fixed time}; the temporal-robustness question---whether the
+pooled decoder \emph{ages} more slowly over days---is orthogonal and, to our knowledge, unaddressed.
 
 \textbf{Conservation of cortex-wide dynamics.} That cortex-wide activity is dominated by shared,
 low-dimensional, movement-related components \citep{musall2019,macdowell2020,macdowell2024} is the
@@ -260,6 +269,15 @@ activity in sensorimotor cortex of freely moving rats enable cross-subject decod
 Communications}, 13:7902, 2022.
 \bibitem[Musall et al.(2019)]{musall2019} S.~Musall et al. Single-trial neural dynamics are
 dominated by richly varied movements. \emph{Nature Neuroscience}, 22(10):1677--1686, 2019.
+\bibitem[Peterson et al.(2021)]{peterson2021} S.~M.~Peterson, Z.~Steine-Hanson, N.~Davis,
+R.~P.~N.~Rao, and B.~W.~Brunton. Generalized neural decoders for transfer learning across
+participants and recording modalities. \emph{Journal of Neural Engineering}, 18:026014, 2021.
+\bibitem[Karpowicz et al.(2025)]{karpowicz2025} B.~M.~Karpowicz, Y.~H.~Ali, L.~N.~Wimalasena,
+et al. Stabilizing brain--computer interfaces through alignment of latent dynamics (NoMAD).
+\emph{Nature Communications}, 16:4662, 2025.
+\bibitem[Wilson et al.(2025)]{wilson2025} G.~H.~Wilson et al. Long-term unsupervised recalibration
+of cursor-based intracortical brain--computer interfaces using a hidden Markov model. \emph{Nature
+Biomedical Engineering}, 2025.
 \bibitem[Rule et al.(2019)]{rule2019} M.~E.~Rule, T.~O'Leary, and C.~D.~Harvey. Causes and
 consequences of representational drift. \emph{Current Opinion in Neurobiology}, 58:141--147, 2019.
 \bibitem[Rule et al.(2020)]{rule2020} M.~E.~Rule et al. Stable task information from an unstable
