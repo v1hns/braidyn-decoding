@@ -78,7 +78,8 @@ decoders directly comparable across time. Our contributions:
 \begin{itemize}\itemsep2pt
 \item \textbf{Pooling resists drift.} Across two weeks, a population-pooled decoder loses less
 accuracy than a mouse's own decoder, for all four decoded events (paired asymmetry $+0.024$ $\auc$,
-$p = 2 \times 10^{-5}$; Section~\ref{sec:asym}).
+$p = 2 \times 10^{-5}$; Section~\ref{sec:asym}), and the personal decoder's advantage erodes
+continuously across the 15-day protocol (Section~\ref{sec:decay}).
 \item \textbf{It is not a data-volume artifact.} A count-matched control isolates the cause. At a
 fixed number of training events, a decoder trained on other mice ages far less than one trained on
 the subject's own ($-0.006$ vs.\ $+0.023$ $\auc$ over two weeks). The gain therefore comes from
@@ -189,6 +190,31 @@ Tone       & $+0.013$ & $-0.010$ & $+0.023$ & 0.005 & 72\% \\
 \end{tabular}
 \end{table}
 
+\subsection{The personal decoder's advantage erodes over the protocol}
+\label{sec:decay}
+The block split compares two windows, but the effect should also appear as a continuous trend across
+all fifteen days. For each session day we compute the accuracy of the personal decoder and the pooled
+decoder and regress each on day; on early days the personal decoder is trained by
+leave-one-session-out, so it is never tested on a session it trained on. The personal decoder starts
+ahead: on day 1 it leads the pooled decoder by about $0.04$ $\auc$, as expected for a decoder trained
+on the same animal. That lead then erodes. Across the protocol the personal decoder declines while
+the pooled decoder holds flat, and the gap between them narrows by $0.0014$ $\auc$ per day, pooled
+over all 100 mouse--target pairs ($p = 5 \times 10^{-5}$; the gap narrows in 64\% of pairs). The
+trend is significant for lick and reward, where the personal decoder loses accuracy over days; for
+lever pull and tone both decoders improve with practice, so the gap stays flat
+(Fig.~\ref{fig:decay}). By day 15 the personal decoder's early advantage has fallen to about
+$0.01$ $\auc$.
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.98\linewidth]{figs/fig_decay.pdf}
+\caption{Decoding accuracy across the 15-day protocol for the personal decoder (own early data) and
+the pooled decoder (other mice's early data), with per-day points and linear fits. The personal
+decoder starts ahead and declines; the pooled decoder holds. Their gap narrows for lick and reward,
+where the personal decoder loses accuracy over days, and stays flat for lever pull and tone, where
+both decoders improve with practice. The per-event gap slope and its $p$ (paired sign-flip over
+mice) are shown.}
+\label{fig:decay}\end{figure}
+
 \subsection{The robustness is not a data-volume artifact}
 \label{sec:matched}
 A pooled decoder contains $\sim$24$\times$ more training events than a personal decoder. Its
@@ -257,16 +283,6 @@ Tone       & $+0.027$ ($0.009$) & $+0.061$ ($<\!10^{-4}$) & $+0.032$ ($0.002$) \
 \bottomrule
 \end{tabular}
 \end{table}
-
-The early/late split is coarse, so we also check that the effect does not depend on the block
-boundaries. For each held-out mouse we regress decoding $\auc$ on the test-session day (restricted to
-days after the training block, so the personal decoder is never tested on its training data) and
-compare the per-mouse day-slope of the personal and pooled decoders. Across all 100 mouse--target
-pairs, the personal decoder's slope is less favorable than the pooled decoder's by $0.0016$ $\auc$
-per day ($p = 0.00025$; the personal decoder is steeper in 70\% of pairs). This continuous test is
-noisier per event (significant for lick and reward, marginal for lever pull, null for tone), but its
-pooled direction matches the block result: the personal decoder's day-to-day trajectory decays
-faster than the pooled decoder's.
 
 \section{Discussion}
 A subject's own decoder overfits idiosyncratic features of its early sessions, some of which later
