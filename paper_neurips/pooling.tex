@@ -42,7 +42,7 @@ regions, a $\sim$15-day operant protocol), we decode four task events and compar
 much accuracy is lost over two weeks by (i) the mouse's own early-week decoder and (ii) a decoder
 pooled over the other 24 mice's early-week data. The pooled decoder ages substantially less: there
 is a $+0.024$ $\auc$ asymmetry between the personal and pooled models ($p = 2 \times 10^{-5}$; the
-own decoder ages quicker in 76 of 100 mouse--target pairs), and the effect holds for all four events
+own decoder ages quicker in 79 of 100 mouse--target pairs), and the effect holds for all four events
 ($p < 0.005$). A count-matched control tells us why: holding the number of training events fixed, a
 decoder from other mice ages far less than the subject's own. Trained on the mouse's own early data
 it loses $0.023$ $\auc$ over the two weeks; trained on the same amount of data from a single other
@@ -164,9 +164,9 @@ For each mouse, we keep the test data fixed (first the mouse's early block, then
 change only the source of the training data: either the mouse itself or the other 24 mice. The
 pooled decoder loses less accuracy across the two weeks (Table~\ref{tab:asym}). The
 personal-minus-pooled aging asymmetry is positive for every event: $+0.014$ for lever pull, $+0.028$
-for lick, $+0.033$ for reward, and $+0.023$ for tone. Each is significant at $p < 0.005$. Across all
+for lick, $+0.033$ for reward, and $+0.022$ for tone. Each is significant at $p < 0.005$. Across all
 100 mouse--target pairs, the asymmetry is $+0.024$ $\auc$ ($p = 2 \times 10^{-5}$), with the personal
-decoder aging more in 76\% of pairs. The same direction holds for lever pull, where both decoders
+decoder aging more in 79\% of pairs. The same direction holds for lever pull, where both decoders
 improve with practice: the pooled decoder improves more. The personal decoder's early-week advantage
 therefore narrows by the late block.
 
@@ -175,17 +175,17 @@ therefore narrows by the late block.
 training fixed), per event, $n = 25$ mice. Asymmetry $=$ personal $-$ pooled aging; a positive value
 means the mouse's own decoder ages more. $p$: paired sign-flip permutation.}
 \label{tab:asym}
-\setlength{\tabcolsep}{4.5pt}
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lccccc}
 \toprule
 Event & Personal aging & Pooled aging & Asymmetry (95\% CI) & $p$ & own ages more \\
 \midrule
-Lever-pull & $-0.012$ & $-0.026$ & $+0.014$ & 0.002 & 68\% \\
-Lick       & $+0.018$ & $-0.010$ & $+0.028$ & 0.0001 & 84\% \\
-Reward     & $+0.023$ & $-0.010$ & $+0.033$ & 0.0001 & 80\% \\
-Tone       & $+0.013$ & $-0.010$ & $+0.023$ & 0.005 & 72\% \\
+Lever-pull & $-0.012$ & $-0.026$ & $+0.014$ $[0.007, 0.022]$ & 0.0012 & 72\% \\
+Lick       & $+0.018$ & $-0.010$ & $+0.028$ $[0.016, 0.040]$ & 0.0002 & 88\% \\
+Reward     & $+0.023$ & $-0.010$ & $+0.033$ $[0.018, 0.049]$ & 0.0001 & 80\% \\
+Tone       & $+0.013$ & $-0.010$ & $+0.022$ $[0.009, 0.037]$ & 0.0043 & 76\% \\
 \midrule
-\textbf{Pooled} & & & $\mathbf{+0.024}$ & $\mathbf{2\times10^{-5}}$ & \textbf{76\%} \\
+\textbf{Pooled} & & & $\mathbf{+0.024}$ & $\mathbf{2\times10^{-5}}$ & \textbf{79\%} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -196,23 +196,26 @@ The block split compares two windows, but the effect should also appear as a con
 all fifteen days. For each session day we compute the accuracy of the personal decoder and the pooled
 decoder and regress each on day; on early days the personal decoder is trained by
 leave-one-session-out, so it is never tested on a session it trained on. The personal decoder starts
-ahead: on day 1 it leads the pooled decoder by about $0.04$ $\auc$, as expected for a decoder trained
-on the same animal. That lead then erodes. Across the protocol the personal decoder declines while
-the pooled decoder holds flat, and the gap between them narrows by $0.0014$ $\auc$ per day, pooled
-over all 100 mouse--target pairs ($p = 5 \times 10^{-5}$; the gap narrows in 64\% of pairs). The
-trend is significant for lick and reward, where the personal decoder loses accuracy over days; for
-lever pull and tone both decoders improve with practice, so the gap stays flat
-(Fig.~\ref{fig:decay}). By day 15 the personal decoder's early advantage has fallen to about
-$0.01$ $\auc$.
+ahead: on day 1 it leads the pooled decoder by about $0.035$ $\auc$, as expected for a decoder
+trained on the same animal. That lead then erodes. The gap narrows by $0.0014$ $\auc$ per day, pooled
+over all 100 mouse--target pairs ($p = 5 \times 10^{-5}$; the gap narrows in 65\% of pairs), so by
+day 15 it has fallen to about $0.014$ $\auc$: roughly 60\% of the early-week advantage is gone.
+Averaged over the four events, the narrowing comes from the pooled decoder gaining accuracy over days
+($+0.0015$ $\auc$/day) while the personal decoder stays flat ($+0.0000$ $\auc$/day); it is not that
+the personal decoder collapses. Per event, the personal decoder does lose accuracy for lick
+($-0.0010$ $\auc$/day) and reward ($-0.0016$ $\auc$/day), and these are the two events where the
+narrowing is individually significant ($p = 0.007$ and $p = 0.001$). For lever pull both decoders
+improve with practice, and for tone the personal decoder is flat; in neither case is the gap slope
+significant (Fig.~\ref{fig:decay}).
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.98\linewidth]{figs/fig_decay.pdf}
 \caption{Decoding accuracy across the 15-day protocol for the personal decoder (own early data) and
 the pooled decoder (other mice's early data), with per-day points and linear fits. The personal
-decoder starts ahead and declines; the pooled decoder holds. Their gap narrows for lick and reward,
-where the personal decoder loses accuracy over days, and stays flat for lever pull and tone, where
-both decoders improve with practice. The per-event gap slope and its $p$ (paired sign-flip over
-mice) are shown.}
+decoder starts ahead, and the pooled decoder gains more over days, so the gap between them narrows.
+The narrowing is significant for lick and reward, the two events where the personal decoder also
+loses accuracy over days, and is not significant for lever pull or tone. The per-event gap slope and
+its $p$ (paired sign-flip over mice) are shown.}
 \label{fig:decay}\end{figure}
 
 \subsection{The robustness is not a data-volume artifact}
@@ -269,7 +272,10 @@ of the code, not of the linear readout.
 \caption{Personal-minus-pooled aging asymmetry under three decoders, per event, $n = 25$ mice. A
 positive value means the personal decoder ages more. Every cell is positive and significant; for
 lever pull and tone the effect is larger with the nonlinear decoders. $p$: paired sign-flip
-permutation.}
+permutation. So that the three decoders differ only in capacity, all of them here use a single
+80/20 split of the early block (the personal decoder trains on the 80\%), rather than the five-fold
+estimate of Table~\ref{tab:asym}; this is why the linear column differs from Table~\ref{tab:asym} by
+up to $0.002$ $\auc$.}
 \label{tab:nl}
 \setlength{\tabcolsep}{5pt}
 \begin{tabular}{lccc}
