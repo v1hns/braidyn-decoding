@@ -1,0 +1,108 @@
+{
+ "targets": {
+  "state_lever": {
+   "linear": {
+    "n": 25,
+    "personal_aging": -0.010022450483148475,
+    "pooled_aging": -0.026105828941233086,
+    "asymmetry": 0.01608337845808461,
+    "p_signflip": 0.019799010049497526,
+    "frac_personal_ages_more": 0.68
+   },
+   "cnn": {
+    "n": 25,
+    "personal_aging": 0.0767609970897351,
+    "pooled_aging": -0.01171703196054596,
+    "asymmetry": 0.08847802905028106,
+    "p_signflip": 4.999750012499375e-05,
+    "frac_personal_ages_more": 1.0
+   },
+   "gru": {
+    "n": 25,
+    "personal_aging": 0.049837225892067905,
+    "pooled_aging": -0.007621983012526648,
+    "asymmetry": 0.05745920890459456,
+    "p_signflip": 4.999750012499375e-05,
+    "frac_personal_ages_more": 1.0
+   }
+  },
+  "lick": {
+   "linear": {
+    "n": 25,
+    "personal_aging": 0.02281298319114888,
+    "pooled_aging": -0.009829491553441483,
+    "asymmetry": 0.03264247474459036,
+    "p_signflip": 0.00034998250087495624,
+    "frac_personal_ages_more": 0.8
+   },
+   "cnn": {
+    "n": 25,
+    "personal_aging": 0.023475690953318126,
+    "pooled_aging": -0.004800953754513628,
+    "asymmetry": 0.028276644707831755,
+    "p_signflip": 4.999750012499375e-05,
+    "frac_personal_ages_more": 0.96
+   },
+   "gru": {
+    "n": 25,
+    "personal_aging": 0.02300326283798183,
+    "pooled_aging": -0.0028026805357591346,
+    "asymmetry": 0.025805943373740963,
+    "p_signflip": 4.999750012499375e-05,
+    "frac_personal_ages_more": 1.0
+   }
+  },
+  "reward": {
+   "linear": {
+    "n": 25,
+    "personal_aging": 0.022432316314786264,
+    "pooled_aging": -0.009060496442918363,
+    "asymmetry": 0.03149281275770463,
+    "p_signflip": 0.0007499625018749063,
+    "frac_personal_ages_more": 0.64
+   },
+   "cnn": {
+    "n": 25,
+    "personal_aging": 0.024244829840503343,
+    "pooled_aging": -0.003819942754212553,
+    "asymmetry": 0.028064772594715896,
+    "p_signflip": 9.99950002499875e-05,
+    "frac_personal_ages_more": 0.84
+   },
+   "gru": {
+    "n": 25,
+    "personal_aging": 0.01694763898157399,
+    "pooled_aging": -0.0019123291051542867,
+    "asymmetry": 0.01885996808672828,
+    "p_signflip": 0.0020998950052497373,
+    "frac_personal_ages_more": 0.8
+   }
+  },
+  "tone": {
+   "linear": {
+    "n": 25,
+    "personal_aging": 0.015863523521424183,
+    "pooled_aging": -0.011295724290689724,
+    "asymmetry": 0.027159247812113905,
+    "p_signflip": 0.008699565021748913,
+    "frac_personal_ages_more": 0.72
+   },
+   "cnn": {
+    "n": 25,
+    "personal_aging": 0.04385707833666478,
+    "pooled_aging": -0.017430566369897434,
+    "asymmetry": 0.0612876447065622,
+    "p_signflip": 4.999750012499375e-05,
+    "frac_personal_ages_more": 0.84
+   },
+   "gru": {
+    "n": 25,
+    "personal_aging": 0.03075826981272928,
+    "pooled_aging": -0.0017274867856729736,
+    "asymmetry": 0.032485756598402256,
+    "p_signflip": 0.0016999150042497876,
+    "frac_personal_ages_more": 0.68
+   }
+  }
+ }
+}

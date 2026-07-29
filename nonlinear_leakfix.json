@@ -1,0 +1,180 @@
+{
+ "targets": {
+  "state_lever": {
+   "linear": {
+    "leaky": {
+     "mean": 0.017718664382078635,
+     "p_signflip": 0.0010499475026248687,
+     "n": 25,
+     "frac_positive": 0.8
+    },
+    "fixed": {
+     "mean": 0.005894313181497491,
+     "p_signflip": 0.11354432278386081,
+     "n": 25,
+     "frac_positive": 0.68
+    }
+   },
+   "cnn": {
+    "leaky": {
+     "mean": 0.07565170959770041,
+     "p_signflip": 4.999750012499375e-05,
+     "n": 25,
+     "frac_positive": 0.92
+    },
+    "fixed": {
+     "mean": 0.020522879209122415,
+     "p_signflip": 0.09364531773411329,
+     "n": 25,
+     "frac_positive": 0.6
+    }
+   },
+   "gru": {
+    "leaky": {
+     "mean": 0.04687917126438164,
+     "p_signflip": 4.999750012499375e-05,
+     "n": 25,
+     "frac_positive": 1.0
+    },
+    "fixed": {
+     "mean": 0.01620885751792935,
+     "p_signflip": 0.15949202539873006,
+     "n": 25,
+     "frac_positive": 0.56
+    }
+   }
+  },
+  "lick": {
+   "linear": {
+    "leaky": {
+     "mean": 0.028368019019403876,
+     "p_signflip": 0.0002999850007499625,
+     "n": 25,
+     "frac_positive": 0.8
+    },
+    "fixed": {
+     "mean": 0.01974519573169904,
+     "p_signflip": 0.003749812509374531,
+     "n": 25,
+     "frac_positive": 0.8
+    }
+   },
+   "cnn": {
+    "leaky": {
+     "mean": 0.02732087688550796,
+     "p_signflip": 4.999750012499375e-05,
+     "n": 25,
+     "frac_positive": 0.96
+    },
+    "fixed": {
+     "mean": 0.012066568582247958,
+     "p_signflip": 0.006999650017499125,
+     "n": 25,
+     "frac_positive": 0.8
+    }
+   },
+   "gru": {
+    "leaky": {
+     "mean": 0.022167654566278738,
+     "p_signflip": 4.999750012499375e-05,
+     "n": 25,
+     "frac_positive": 0.96
+    },
+    "fixed": {
+     "mean": 0.010295703738027772,
+     "p_signflip": 0.023998800059997,
+     "n": 25,
+     "frac_positive": 0.68
+    }
+   }
+  },
+  "reward": {
+   "linear": {
+    "leaky": {
+     "mean": 0.025899647324591824,
+     "p_signflip": 0.0009499525023748813,
+     "n": 25,
+     "frac_positive": 0.8
+    },
+    "fixed": {
+     "mean": 0.02943905998019828,
+     "p_signflip": 0.0007499625018749063,
+     "n": 25,
+     "frac_positive": 0.76
+    }
+   },
+   "cnn": {
+    "leaky": {
+     "mean": 0.02572394690861703,
+     "p_signflip": 0.005949702514874256,
+     "n": 25,
+     "frac_positive": 0.8
+    },
+    "fixed": {
+     "mean": 0.014632451286441745,
+     "p_signflip": 0.020298985050747464,
+     "n": 25,
+     "frac_positive": 0.64
+    }
+   },
+   "gru": {
+    "leaky": {
+     "mean": 0.019070089647887357,
+     "p_signflip": 0.004699765011749413,
+     "n": 25,
+     "frac_positive": 0.76
+    },
+    "fixed": {
+     "mean": 0.011590336154928185,
+     "p_signflip": 0.0063996800159992,
+     "n": 25,
+     "frac_positive": 0.68
+    }
+   }
+  },
+  "tone": {
+   "linear": {
+    "leaky": {
+     "mean": 0.02986210692840171,
+     "p_signflip": 0.001399930003499825,
+     "n": 25,
+     "frac_positive": 0.72
+    },
+    "fixed": {
+     "mean": 0.015584374223120565,
+     "p_signflip": 0.09304534773261337,
+     "n": 25,
+     "frac_positive": 0.64
+    }
+   },
+   "cnn": {
+    "leaky": {
+     "mean": 0.07583345472473929,
+     "p_signflip": 4.999750012499375e-05,
+     "n": 25,
+     "frac_positive": 0.92
+    },
+    "fixed": {
+     "mean": 0.04653222248748795,
+     "p_signflip": 4.999750012499375e-05,
+     "n": 25,
+     "frac_positive": 0.84
+    }
+   },
+   "gru": {
+    "leaky": {
+     "mean": 0.03485716337211166,
+     "p_signflip": 4.999750012499375e-05,
+     "n": 25,
+     "frac_positive": 0.8
+    },
+    "fixed": {
+     "mean": 0.0196473202752418,
+     "p_signflip": 0.014299285035748212,
+     "n": 25,
+     "frac_positive": 0.64
+    }
+   }
+  }
+ }
+}
