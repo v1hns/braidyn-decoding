@@ -1,7 +1,7 @@
 \documentclass{article}
 
 \PassOptionsToPackage{numbers,compress}{natbib}
-\usepackage{neurips_2024}
+\usepackage{neurips_2026}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -17,13 +17,12 @@
 \usepackage{multirow}
 
 % Camera-ready only: reveals authors. Keep commented out for submission.
-% \usepackage[final]{neurips_2024}
+% \usepackage[final]{neurips_2026}
 
 \newcommand{\auc}{\mathrm{AUC}}
 
-\title{Population Pooling Confers Drift Resistance:\\
-Cross-Subject Decoders Age Slower Than Subject-Specific Ones\\
-in Mesoscale Cortex}
+\title{Cortical Decoders Trained on Other Individuals\\
+Age Slower Than Your Own}
 
 \author{%
   Anonymous Author(s)\\
@@ -35,212 +34,377 @@ in Mesoscale Cortex}
 \maketitle
 
 \begin{abstract}
-Cortical representations \emph{drift}: a decoder fit to one animal's neural activity slowly loses
-accuracy on that same animal over days, even when behavior is unchanged. The standard remedy is
-periodic recalibration on fresh within-subject data. We report a different form of robustness. On
-the open BraiDyn-BC cohort (25 mice, cortex-wide widefield $\Delta F/F$ parcellated into 44
-Allen-atlas regions, a $\sim$15-day operant protocol), we decode four task events and compare, per
-mouse, how much accuracy is lost across two weeks by (i) that mouse's \emph{own} early-week decoder
-and (ii) a decoder \emph{pooled} over the other 24 mice's early-week data. The pooled decoder ages
-substantially less: the paired personal-minus-pooled aging asymmetry is $+0.024$ $\auc$
-($p=2\times10^{-5}$, sign-flip; the own decoder ages more in $76\%$ of the 100 mouse--target pairs),
-and the effect holds for all four events individually ($p<0.005$). A count-matched control is
-decisive about \emph{why}: holding the number of training events fixed, a decoder built from
-\emph{other} individuals ages far less than the subject's own ($+0.023$ $\auc$ for self vs.\
-$-0.006$ for a single other mouse at equal sample count), so the robustness is not a data-volume
-artifact but follows from not overfitting the subject's own drift-prone idiosyncrasies. Pooling
-over \emph{many} other individuals rather than one adds a further, smaller and direction-consistent
-gain (to $-0.012$), yielding a graded self~$\to$~one-other~$\to$~many-others ordering. Population
-pooling is thus a drift-mitigation strategy in its own right: the small early-week accuracy cost of
-decoding across individuals is repaid as temporal stability. Code and a streamed-feature pipeline
-are released.
+Cortical representations drift; a decoder fit to one animal's neural activity slowly loses accuracy
+on that animal over days, even with unchanged behavior. The standard solution is periodic
+recalibration on fresh data from the subject; we report a different form of robustness. On the open
+BraiDyn-BC cohort (25 mice, cortex-wide widefield $\Delta F/F$ parcellated into 44 Allen-atlas
+regions, a $\sim$15-day operant protocol), we decode four task events and compare, per mouse, how
+much accuracy is lost over two weeks by (i) the mouse's own early-week decoder and (ii) a decoder
+pooled over the other 24 mice's early-week data. Trials recorded in one session share imaging
+conditions, hemodynamic state and slow arousal, so every within-subject estimate here holds out
+whole sessions rather than trials; splitting at the trial level inflates the personal decoder, and
+therefore the asymmetry itself, by up to $0.013$ $\auc$. Under the session-held-out protocol the
+pooled decoder ages less: the personal-minus-pooled asymmetry is $+0.017$ $\auc$
+($p = 5 \times 10^{-5}$; the own decoder ages quicker in 73 of 100 mouse--target pairs). The effect
+is carried by two of the four events, lick ($+0.020$, $p = 0.002$) and reward ($+0.029$,
+$p = 0.0005$), while tone is marginal ($+0.015$, $p = 0.08$) and lever pull is null ($+0.003$,
+$p = 0.37$). A day-by-day regression across the full 15-day protocol independently finds a narrowing
+personal-versus-pooled gap for exactly those two events, so two analyses with different estimators
+agree on which events carry the effect. A count-matched control isolates the cause: holding the
+number of training events fixed, the subject's own decoder ages more than one trained on a single
+other mouse for lick ($+0.007$), reward ($+0.017$) and tone ($+0.006$). As both see equal data this
+is not a data-volume effect; it follows from not overfitting the subject's own drift-prone
+idiosyncrasies. Training on many other mice rather than one lowers aging further on all four events.
+For lick and reward the asymmetry also survives replacing the linear readout with a 1-D CNN or a GRU,
+so it is a property of the code rather than of the readout. Population pooling is thus a
+drift-mitigation strategy in its own right: the early-week cost of decoding across individuals is
+repaid as temporal stability. Code and a streamed-feature pipeline are released.
 \end{abstract}
 
 \section{Introduction}
-Representational drift---the gradual reorganization of a neural code over days while the animal's
-behavior stays fixed---is now documented across sensory, motor, and association cortex and in
-hippocampus \citep{rule2020,driscoll2017,schoonover2021}. Its practical consequence for
-neural decoding is stark: a decoder trained on an animal today degrades on that same animal weeks
-later. The dominant response is \emph{recalibration}---periodically refitting or adapting the
-decoder on fresh within-subject data \citep{degenhart2020,jarosiewicz2015}---which requires
-ongoing labelled data from the individual and treats each subject in isolation.
+Representational drift, the reorganization of an animal's neural code over days with fixed behavior,
+is now documented across sensory, motor, and association cortex and in the hippocampus
+\citep{rule2020,driscoll2017,schoonover2021}. This has a stark impact on neural decoding: a decoder
+trained on an animal today degrades on that same animal weeks later. The dominant response is
+recalibration: periodically refitting the decoder on fresh, within-subject data
+\citep{degenhart2020,jarosiewicz2015}. Recalibration requires ongoing labelled data from the
+individual, and it treats each subject in isolation.
 
-We ask whether the code's cross-individual structure offers a complementary route to temporal
-robustness. Cortex-wide behavioral representations are known to be substantially shared across
-individuals \citep{musall2019,macdowell2020,macdowell2024}, and recent models decode behavior
-zero-shot on unseen subjects \citep{wicat2026}. That prior work is evaluated at essentially one
-point in time. The question we pose is temporal: \emph{does a decoder built from a population of
-other individuals resist drift better than a decoder built from the subject itself?} If individual
-brains drift along idiosyncratic, partly independent trajectories, then averaging over many
-individuals should cancel the individual-specific component of drift---so a pooled decoder would age
-more slowly than a personal one. This is a concrete, testable prediction that, to our knowledge, has
-not been examined.
+We ask whether the code's cross-individual structure offers an alternative route to temporal
+robustness. Cortex-wide behavioral representations are known to be considerably shared among
+individuals \citep{musall2019,macdowell2020,macdowell2024}, which allows models to decode behavior
+from unseen individuals \citep{wicat2026}. The question we pose is temporal: does a decoder built
+from a population of other individuals resist drift better than a decoder built from the subject
+itself? If individual brains drift along idiosyncratic, partly independent trajectories, then
+averaging over many individuals should cancel the individual-specific component of drift. This
+prediction, to our knowledge, has not been examined.
 
 We test it on BraiDyn-BC \citep{kondo2025}, a widefield calcium-imaging resource whose $\sim$15-day
 operant protocol and shared 44-region Allen parcellation make within-subject and cross-subject
 decoders directly comparable across time. Our contributions:
 \begin{itemize}\itemsep2pt
-\item \textbf{Pooling resists drift.} Across two weeks, a population-pooled decoder loses less
-accuracy than a mouse's own decoder, for all four decoded events (paired asymmetry $+0.024$ $\auc$,
-$p=2\times10^{-5}$; Section~\ref{sec:asym}).
-\item \textbf{It is not a data-volume artifact.} A count-matched control shows that, at equal
-training-set size, other-individual data ages far less than the subject's own; a graded
-self~$\to$~one-other~$\to$~many-others ordering isolates avoiding self-overfitting as the primary
-driver and cross-individual diversity as a secondary, consistent refinement
+\item \textbf{Pooling resists drift, on two of four events.} Across two weeks a population-pooled
+decoder loses less accuracy than a mouse's own (paired asymmetry $+0.017$ $\auc$,
+$p = 5 \times 10^{-5}$; Section~\ref{sec:asym}). Per event the effect is significant for lick and
+reward, marginal for tone, and absent for lever pull, and a day-by-day regression over the whole
+protocol independently selects the same two events (Section~\ref{sec:decay}).
+\item \textbf{It is not a data-volume artifact.} A count-matched control isolates the cause. At a
+fixed number of training events, a decoder trained on one other mouse ages less than one trained on
+the subject's own, by $+0.007$ (lick), $+0.017$ (reward) and $+0.006$ $\auc$ (tone). The gain
+therefore comes from training on individuals other than the subject, not from the larger training
+set pooling usually brings. Pooling over many mice rather than one lowers aging further on all four
+events, a smaller additional gain from a more diverse set of individuals
 (Sections~\ref{sec:matched}--\ref{sec:scaling}).
-\item \textbf{A drift-mitigation framing.} The early-week accuracy penalty of cross-subject decoding
-is repaid as late-week stability, suggesting population priors as an alternative to per-subject
+\item \textbf{Session-level validation is load-bearing.} Because trials within a recording session
+are not independent, a trial-level split inflates the personal decoder but not the pooled one, and
+so inflates the asymmetry from one side. We report the size of that inflation per event
+(Section~\ref{sec:protocol}); on lever pull it accounts for the entire apparent effect. We
+recommend session-held-out validation as the default for longitudinal decoding comparisons.
+\item \textbf{A drift-mitigation framing.} The early-week accuracy loss of cross-subject decoding is
+repaid as late-week stability, suggesting population priors as an alternative to per-subject
 recalibration. We release code and a no-raw-download streaming pipeline.
 \end{itemize}
 
 \section{Related work}
-\textbf{Representational drift and its mitigation.} Drift is characterized within a single
-subject \citep{rule2020,driscoll2017,schoonover2021,rule2019}, and the engineering response is
-within-subject recalibration or latent re-alignment: manifold stabilization
-\citep{degenhart2020}, supervised and self-calibrating recalibration
-\citep{jarosiewicz2015,wilson2025}, adversarial and nonlinear latent-dynamics alignment to the
-subject's own reference day \citep{farshchian2019,karpowicz2025}. Every one of these stabilizes a
-decoder using \emph{that subject's} own later data; none uses a population of \emph{other} subjects
-as the source of stability, which is our question.
+\textbf{Representational drift and its mitigation.} Drift is characterized within individual
+subjects \citep{rule2020,driscoll2017,schoonover2021,rule2019}, and most approaches to mitigating it
+also operate within the subject. These include manifold stabilization \citep{degenhart2020},
+supervised and self-calibrating recalibration \citep{jarosiewicz2015,wilson2025}, and adversarial or
+nonlinear alignment to the subject's own reference day \citep{farshchian2019,karpowicz2025}. Each
+method uses later data from the same subject to stabilize the decoder. We instead ask whether data
+from other subjects can provide that stability.
 
-\textbf{Cross-subject decoding.} Shared structure across individuals supports cross-subject readout
-via manifold alignment \citep{melbaum2022}, contrastive embeddings \citep{schneider2023}, and, on
-this very cohort, atlas-aligned foundation models \citep{wicat2026}. Pooling across participants is
-also known to \emph{reduce overfitting}: HTNet trains one decoder on pooled multi-participant data
-precisely to ``avoid overfit decoders'' from single-subject data scarcity \citep{peterson2021}. Two
-things separate that line from ours. First, the overfitting it avoids is \emph{sample-size}
-overfitting (too little data per subject), whereas our count-matched control holds training-set size
-fixed and still finds the effect, so the overfitting we implicate is to the subject's
-\emph{drift-prone} features rather than to small samples. Second, and more basically, all of these
-target accuracy/transfer at a \emph{fixed time}; the temporal-robustness question---whether the
-pooled decoder \emph{ages} more slowly over days---is orthogonal and, to our knowledge, unaddressed.
+\textbf{Cross-subject decoding.} Shared structure across individuals already supports cross-subject
+readout through manifold alignment \citep{melbaum2022}, contrastive embeddings \citep{schneider2023},
+and, on this cohort, atlas-aligned foundation models \citep{wicat2026}. Multi-participant pooling can
+also reduce overfitting: HTNet, for example, pools participant data to avoid fitting a decoder to a
+small single-subject sample \citep{peterson2021}. Our question differs in two ways. First, our
+count-matched control keeps the training-set size fixed; the relevant overfitting is therefore not a
+consequence of limited data, but of relying on subject-specific features that later drift. Second,
+prior work measures accuracy or transfer at a fixed time. We measure how that accuracy changes over
+days, asking whether a pooled decoder ages more slowly.
 
-\textbf{Conservation of cortex-wide dynamics.} That cortex-wide activity is dominated by shared,
-low-dimensional, movement-related components \citep{musall2019,macdowell2020,macdowell2024} is the
-premise that makes cross-subject pooling viable at all; it does not by itself imply anything about
-drift.
+\textbf{Conservation of cortex-wide dynamics.} Cortex-wide activity contains shared,
+low-dimensional, movement-related components \citep{musall2019,macdowell2020,macdowell2024}. Their
+presence makes cross-subject pooling possible, although it does not alone imply that pooling will
+resist drift.
 
 \section{Data and methods}
-\textbf{Dataset.} BraiDyn-BC \citep{kondo2025} (DANDI:001425, CC-BY): per mouse and session,
-hemodynamically corrected dorsal-cortex $\Delta F/F$ parcellated into 44 Allen Common Coordinate
-Framework regions at $\sim$30\,Hz, with time-aligned behavioral channels. Twenty-five mice each
-performed $\sim$15 daily operant sessions over $\sim$3 weeks. We stream only the 44-region traces
-and behavioral channels (never the raw movies).
+\textbf{Dataset.} BraiDyn-BC \citep{kondo2025} (DANDI:001425, CC-BY) provides, for each mouse and
+session, hemodynamically corrected dorsal-cortex $\Delta F/F$ traces parcellated into 44 Allen Common
+Coordinate Framework regions at $\sim$30\,Hz, together with time-aligned behavioral channels. The
+dataset includes 25 mice, each of which completed $\sim$15 daily operant sessions over $\sim$3 weeks.
+We stream the 44-region traces and behavioral channels without downloading the raw movies.
 
-\textbf{Features and events.} For each of four events (lever-pull, lick, reward, tone) we detect
-onsets as rising edges (1\,s refractory) and form a 44-dimensional evoked feature: mean post-onset
-($0$--$1$\,s) parcellated $\Delta F/F$ minus a pre-onset ($-0.5$--$0$\,s) baseline. Negatives are
-matched-count windows drawn $>2$\,s from any event. The decoder is a standardized
-$\ell_2$-regularized logistic regression throughout.
+\textbf{Features and events.} We detect the onset of four events (lever pull, lick, reward, and
+tone) as rising edges, with a 1\,s refractory period. For each onset we construct a 44-dimensional
+evoked feature by subtracting the mean pre-onset baseline ($-0.5$--$0$\,s) from the mean post-onset
+$\Delta F/F$ response ($0$--$1$\,s) in each parcel. Negative samples are drawn from matched-count
+windows more than 2\,s from any event. Every classification is a binary decode of one event against
+these matched negatives, scored by area under the ROC curve ($\auc$).
 
-\textbf{Temporal blocks.} Each mouse's task sessions are pooled into an \emph{early} block
-(days 1--5) and a \emph{late} block (days 11--15). We report $\auc$ in four regimes: within-mouse
-same-block (5-fold CV on early, WS), within-mouse across-block (train early $\to$ test late, WX),
-pooled same-block (train other mice's early $\to$ test held-out early, LS), and pooled across-block
-(train other mice's early $\to$ test held-out \emph{late}, LX).
+\textbf{Decoders.} The primary decoder is a standardized $\ell_2$-regularized logistic regression on
+the 44-dimensional evoked feature. This is a linear readout of the parcel-space code: it recovers the
+component of behavior that is linearly present in the population average, and, because it has no
+capacity to memorize spatiotemporal detail, it cannot inflate an apparent generalization difference
+through overfitting. It is also the natural comparison to prior cross-subject decoders, which are
+overwhelmingly linear \citep{melbaum2022,peterson2021}. Except where Section~\ref{sec:nl} varies it deliberately,
+every condition below uses this same readout, so the only variable is which data the decoder was
+trained on. For that section we additionally train a 1-D convolutional network over time and a GRU
+over the frame sequence on the full evoked window ($-0.5$ to $+1.0$\,s, $45 \times 44$), each with a
+linear classification head, on identical events, blocks and splits.
 
-\textbf{Aging.} We define a decoder's \emph{aging} as its accuracy drop when the test set moves from
-the held-out mouse's early block to its late block, holding training fixed. Personal aging is
-$\mathrm{WS}-\mathrm{WX}$; pooled aging is $\mathrm{LS}-\mathrm{LX}$. The per-mouse
-\emph{asymmetry} is $(\mathrm{WS}-\mathrm{WX})-(\mathrm{LS}-\mathrm{LX})$; positive means the own
-decoder ages more. Significance is a paired sign-flip permutation test over mice
-($20{,}000$ permutations), with a cluster (over-mice) bootstrap 95\% CI.
+\textbf{Temporal blocks and aging.} We group each mouse's sessions into an early block (days 1--5)
+and a late block (days 11--15) and report $\auc$ under four conditions. The personal decoder is
+estimated by leaving out one whole early \emph{session} at a time: for each early session $s$ we
+train on the mouse's remaining early sessions and score the resulting decoder both on $s$
+(within-mouse same-block, WS) and on the late block (within-mouse across-block, WX), then average
+over $s$. Because WS and WX come from the same fitted decoders, they differ only in which data they
+are tested on. The pooled decoder is trained once on the other mice's early blocks and scored on the
+same held-out sessions $s$ (LS) and on the late block (LX).
+
+Holding out sessions rather than trials is essential and not a detail. Trials within one recording
+share illumination and hemodynamic state, slow arousal drift, and temporal autocorrelation, so a
+trial-level split lets the personal decoder train and test inside the same session. The pooled
+decoder is trained on other animals entirely and cannot benefit this way, so the inflation is
+one-sided and lands directly on the quantity of interest. Section~\ref{sec:protocol} reports what
+that costs per event.
+
+Aging is the accuracy lost when testing moves from the held-out mouse's early data to its late block
+while training stays fixed: personal aging is $\mathrm{WS}-\mathrm{WX}$ and pooled aging is
+$\mathrm{LS}-\mathrm{LX}$. The per-mouse aging asymmetry is
+$(\mathrm{WS}-\mathrm{WX})-(\mathrm{LS}-\mathrm{LX})$; a positive value means the personal decoder
+ages more. We assess significance with a paired sign-flip permutation test across mice
+(20{,}000 permutations) and compute 95\% confidence intervals with a cluster bootstrap over mice.
 
 \section{Results}
 
 \subsection{A population-pooled decoder ages more slowly than a personal one}
 \label{sec:asym}
-For every mouse we hold the test data fixed---that mouse's own early then late block---and vary only
-the decoder's \emph{training} source: the mouse itself versus the other 24. The pooled decoder loses
-less accuracy across the two weeks (Table~\ref{tab:asym}). The paired personal-minus-pooled aging
-asymmetry is positive for all four events (lever-pull $+0.014$, lick $+0.028$, reward $+0.033$,
-tone $+0.023$), each significant at $p<0.005$; pooled over all 100 mouse--target pairs the asymmetry
-is $+0.024$ $\auc$ ($p=2\times10^{-5}$), and the personal decoder ages more in $76\%$ of pairs. The
-sign is consistent even where both decoders happen to \emph{improve} with practice (lever-pull): the
-pooled decoder improves \emph{more}. Read as a gap, the early-week advantage of the personal decoder
-over the pooled one shrinks toward zero by the late week, because only the personal decoder ages.
+For each mouse, we keep the test data fixed (first the mouse's held-out early sessions, then its late
+block) and change only the source of the training data: either the mouse itself or the other 24 mice.
+The pooled decoder loses less accuracy across the two weeks (Table~\ref{tab:asym}). Across all 100
+mouse--target pairs the asymmetry is $+0.017$ $\auc$ ($p = 5 \times 10^{-5}$), with the personal
+decoder aging more in 73\% of pairs.
+
+The effect is not uniform across events, and we do not claim that it is. It is clearly present for
+reward ($+0.029$, $p = 0.0005$) and lick ($+0.020$, $p = 0.002$), marginal for tone ($+0.015$,
+$p = 0.08$), and absent for lever pull ($+0.003$, $p = 0.37$). Lever pull is the one event where
+both decoders \emph{improve} across the protocol as the animal becomes more practiced, and once
+sessions are held out properly the pooled decoder's improvement no longer exceeds the personal
+decoder's by a detectable margin. Section~\ref{sec:decay} shows that a completely different
+estimator -- a day-by-day regression rather than a two-block contrast -- selects the same two
+events, which is the main reason we regard the lick and reward results as real rather than as a
+surviving tail of the same multiple-comparisons pool.
 
 \begin{table}[t]\centering
-\caption{Personal vs.\ pooled aging across days ($\auc$ lost from early- to late-block test,
-holding training fixed), per event, $n=25$ mice. Asymmetry $=$ personal $-$ pooled aging; positive
-$\Rightarrow$ the mouse's own decoder ages more. $p$: paired sign-flip permutation.}
+\caption{Personal vs.\ pooled aging across days ($\auc$ lost from early to late test, holding
+training fixed), per event, $n = 25$ mice, with whole early sessions held out. Asymmetry $=$
+personal $-$ pooled aging; a positive value means the mouse's own decoder ages more. $p$: paired
+sign-flip permutation. The rightmost column gives the same asymmetry under a trial-level split, the
+protocol this analysis replaces; the difference is the inflation quantified in
+Section~\ref{sec:protocol}.}
 \label{tab:asym}
-\setlength{\tabcolsep}{4.5pt}
-\begin{tabular}{lccccc}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccccccc}
 \toprule
-Event & Personal aging & Pooled aging & Asymmetry (95\% CI) & $p$ & own ages more \\
+Event & Personal & Pooled & Asymmetry (95\% CI) & $p$ & own ages more & trial-split \\
 \midrule
-Lever-pull & $-0.012$ & $-0.026$ & $+0.014$ & 0.002 & 68\% \\
-Lick       & $+0.018$ & $-0.010$ & $+0.028$ & 0.0001 & 84\% \\
-Reward     & $+0.023$ & $-0.010$ & $+0.033$ & 0.0001 & 80\% \\
-Tone       & $+0.013$ & $-0.010$ & $+0.023$ & 0.005 & 72\% \\
+Lever-pull & $-0.022$ & $-0.025$ & $+0.003$ $[-0.004, 0.011]$ & 0.37 & 64\% & $+0.014$ \\
+Lick       & $+0.012$ & $-0.009$ & $+0.020$ $[0.008, 0.032]$ & 0.0023 & 80\% & $+0.028$ \\
+Reward     & $+0.017$ & $-0.012$ & $+0.029$ $[0.014, 0.046]$ & 0.0005 & 80\% & $+0.032$ \\
+Tone       & $+0.016$ & $+0.001$ & $+0.015$ $[0.001, 0.032]$ & 0.077 & 68\% & $+0.022$ \\
 \midrule
-\textbf{Pooled} & & & $\mathbf{+0.024}$ & $\mathbf{2\times10^{-5}}$ & \textbf{76\%} \\
+\textbf{Pooled} & & & $\mathbf{+0.017}$ $[0.010, 0.024]$ & $\mathbf{5\times10^{-5}}$ & \textbf{73\%} & $+0.024$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+\subsection{The personal decoder's advantage erodes over the protocol}
+\label{sec:decay}
+The block split compares two windows, but the effect should also appear as a continuous trend across
+all fifteen days. For each session day we compute the accuracy of the personal decoder and the pooled
+decoder and regress each on day; on early days the personal decoder is trained by
+leave-one-session-out, so it is never tested on a session it trained on. The personal decoder starts
+ahead: on day 1 it leads the pooled decoder by about $0.035$ $\auc$, as expected for a decoder
+trained on the same animal. That lead then erodes. The gap narrows by $0.0014$ $\auc$ per day, pooled
+over all 100 mouse--target pairs ($p = 5 \times 10^{-5}$; the gap narrows in 65\% of pairs), so by
+day 15 it has fallen to about $0.014$ $\auc$: roughly 60\% of the early-week advantage is gone.
+Averaged over the four events, the narrowing comes from the pooled decoder gaining accuracy over days
+($+0.0015$ $\auc$/day) while the personal decoder stays flat ($+0.0000$ $\auc$/day); it is not that
+the personal decoder collapses. Per event, the personal decoder does lose accuracy for lick
+($-0.0010$ $\auc$/day) and reward ($-0.0016$ $\auc$/day), and these are the two events where the
+narrowing is individually significant ($p = 0.007$ and $p = 0.001$). For lever pull both decoders
+improve with practice, and for tone the personal decoder is flat; in neither case is the gap slope
+significant (Fig.~\ref{fig:decay}).
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.98\linewidth]{figs/fig_decay.pdf}
+\caption{Decoding accuracy across the 15-day protocol for the personal decoder (own early data) and
+the pooled decoder (other mice's early data), with per-day points and linear fits. The personal
+decoder starts ahead, and the pooled decoder gains more over days, so the gap between them narrows.
+The narrowing is significant for lick and reward, the two events where the personal decoder also
+loses accuracy over days, and is not significant for lever pull or tone. The per-event gap slope and
+its $p$ (paired sign-flip over mice) are shown.}
+\label{fig:decay}\end{figure}
+
 \subsection{The robustness is not a data-volume artifact}
 \label{sec:matched}
-A pooled decoder is trained on $\sim$24$\times$ more events than a personal one, so the obvious
-deflationary explanation is that more data, not pooling, buys the robustness. We rule this out with
-a count-matched control (Fig.~\ref{fig:mech}, left). For each held-out mouse we fix the number of
-training events at that mouse's \emph{own} early-block count $n$ and compare three decoders on the
-same held-out early$\to$late aging: \textbf{self} (the mouse's own $n$ events), \textbf{one} ($n$
-events from a single other mouse), and \textbf{many} ($n$ events drawn across the other 24). The
-result is a clean ordering, consistent in all four events (means over targets): self ages
-$+0.023$, one-other $-0.006$, many-others $-0.012$ $\auc$. Two things follow. First, at
-\emph{identical} sample count the subject's own decoder ages $+0.029$ more than a single other
-mouse's---so volume is not the driver; training on data other than the subject's own is. The
-subject's early-week decoder overfits idiosyncratic features that then drift, and any decoder that
-never saw the subject sidesteps this. Second, pooling over many others rather than one ages a
-further $-0.006$ (many $<$ one in $4/4$ events), so cross-individual diversity contributes a
-smaller, secondary refinement on top of the primary self-vs-other effect.
+A pooled decoder contains $\sim$24$\times$ more training events than a personal decoder. Its
+stability could therefore reflect data volume rather than pooling. We test this with a count-matched
+control (Fig.~\ref{fig:mech}, left). For each held-out early session $s$ of each mouse we set the
+training-set size to $n$, the number of events in that mouse's remaining early sessions, and compare
+three decoders: \emph{self}, trained on those $n$ events; \emph{one}, trained on $n$ events from a
+single other mouse; and \emph{many}, trained on $n$ events drawn across the other 24 mice. All three
+are scored on the same held-out session $s$ and the same late block, so they differ only in whose
+data they were fit on.
+
+For the events that showed an asymmetry in Section~\ref{sec:asym}, the count-matched ordering
+reproduces it. The self decoder ages more than a decoder trained on one other mouse by $+0.007$
+$\auc$ for lick ($+0.012$ vs.\ $+0.005$), $+0.017$ for reward ($+0.017$ vs.\ $+0.000$), and $+0.006$
+for tone ($+0.016$ vs.\ $+0.010$). Because both decoders see the same number of training events, data
+volume cannot explain these gaps: what distinguishes them is only whether the training data came
+from the subject. The reading we favour is that the mouse's own early decoder fits idiosyncratic
+features that later drift, features a decoder trained on another animal never had access to.
+
+Lever pull again behaves differently: at matched count the self decoder ages \emph{less} than the
+one-other decoder ($-0.022$ vs.\ $-0.020$), reversing the ordering. Consistently with
+Section~\ref{sec:asym}, we do not claim the effect for this event.
+
+The diversity ordering is the most robust result in this analysis: \emph{many} ages less than
+\emph{one} for all four events, including lever pull ($-0.026$ vs.\ $-0.020$; $-0.003$ vs.\ $+0.005$
+for lick, $-0.009$ vs.\ $+0.000$ for reward, $+0.000$ vs.\ $+0.010$ for tone). Training on a diverse
+set of individuals rather than a single other individual therefore provides a smaller, additional
+benefit that does not depend on which event is decoded.
 
 \subsection{Diversity: a secondary scaling with the number of training individuals}
 \label{sec:scaling}
-Consistent with that secondary effect, sweeping the number of training mice
-$N\in\{1,2,4,8,16,24\}$ (Fig.~\ref{fig:mech}, right) shows pooled aging becoming mildly more
-favorable as $N$ grows for lick ($-0.001\!\to\!-0.010$), reward ($-0.004\!\to\!-0.010$), and tone
-($+0.003\!\to\!-0.010$); for lever-pull it saturates immediately ($\approx-0.025$ from $N{=}1$).
-The scaling is modest ($\sim$0.01 $\auc$) next to the self-vs-other gap ($\sim$0.03), matching the
-count-matched decomposition: most of the drift resistance is already present with a single other
-individual, and additional individuals refine it.
+We next vary the number of training mice, $N \in \{1, 2, 4, 8, 16, 24\}$ (Fig.~\ref{fig:mech},
+right). As $N$ increases, pooled aging becomes slightly more favorable for lick ($-0.001$ to
+$-0.010$), reward ($-0.004$ to $-0.010$), and tone ($+0.003$ to $-0.010$). Lever-pull performance
+saturates with a single training mouse and remains near $-0.025$. The scaling effect is around
+$0.01$ $\auc$, comparable to the $0.006$--$0.017$ self-versus-one-other gap of
+Section~\ref{sec:matched} rather than small beside it. Most of the resistance to drift is already
+present when training on a single other individual, and additional individuals refine it further;
+this analysis never lets the decoder see the held-out mouse, so it is unaffected by the protocol
+issue of Section~\ref{sec:protocol}.
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.98\linewidth]{figs/fig_mechanism.pdf}
-\caption{\textbf{Left:} count-matched control. At equal training-event count, decoder aging
-(AUC lost early$\to$late; plotted so lower is more robust) for the subject's own data (self) vs.\
-one other mouse vs.\ many others. Self ages; other-individual data does not, even at matched count.
-\textbf{Right:} pooled aging vs.\ number of training mice $N$; diversity adds a small further gain
-(saturating for lever-pull).}
+\caption{\textbf{Left:} count-matched control. With equal numbers of training events, decoder aging
+(AUC lost from early to late; lower values indicate greater robustness) is compared for the subject's
+own data (self), one other mouse, and many other mice. The self decoder ages, whereas the
+other-individual decoders do not. \textbf{Right:} pooled aging as a function of the number of
+training mice $N$. Greater diversity provides a small additional gain, with immediate saturation for
+lever pull.}
 \label{fig:mech}\end{figure}
 
-\section{Discussion}
-On a 25-mouse, 15-day widefield cohort, a decoder pooled over a population of other individuals
-resists cross-day drift better than a subject's own decoder. A count-matched control shows this is
-not a data-volume artifact: at equal training-set size, other-individual data ages far less than
-the subject's own, with cross-individual diversity adding a smaller, consistent refinement. The
-natural reading is that a subject's own decoder overfits idiosyncratic, drift-prone features of that
-subject's early sessions, while a decoder that never saw the subject can only latch onto the shared,
-temporally stable component of the code. This reframes population structure as a \emph{temporal}
-resource: the well-known small accuracy penalty of cross-subject decoding is not merely tolerable
-but is repaid, over days, as stability. Where within-subject recalibration spends fresh labelled
-data from the individual to chase a drifting code, a population prior buys stability up front and
-for free at test time.
+\subsection{How much the validation protocol matters}
+\label{sec:protocol}
+Every number above holds out whole sessions. Repeating the identical analysis on the identical
+features with a trial-level split -- shuffling trials pooled across the early sessions, so that a
+decoder may train on one part of a session and be tested on another -- inflates the personal
+decoder's within-block accuracy by $+0.013$ (lever pull), $+0.010$ (lick), $+0.009$ (reward) and
+$+0.000$ $\auc$ (tone). The pooled decoder is unaffected, because it is trained on other animals and
+has no session in common with the test data.
 
-\textbf{Limitations.} The effect is measured at the mesoscale (parcel-averaged) level; whether it
-holds for single-neuron codes, where drift is characterized, is untested and is the natural next
-question. We study four thresholdable task events over a two-week window in one species; longer
-horizons, graded behaviors, and other modalities remain open. Our conclusions rest on
-within-vs-pooled and early-vs-late \emph{comparisons} rather than absolute $\auc$. Finally, the
-count-matched control rules out data volume and points to self-overfitting, but the diversity
-increment is small and we do not identify which components of the drift are individual-specific.
+The consequence is that the inflation lands on one side of a difference between two arms. Asymmetries
+measured this way are $+0.014$, $+0.028$, $+0.032$ and $+0.022$ for lever pull, lick, reward and tone
+(rightmost column of Table~\ref{tab:asym}), against $+0.003$, $+0.020$, $+0.029$ and $+0.015$ with
+sessions held out. For lever pull that difference is the entire effect: what looks like a
+significant $+0.014$ ($p = 0.001$) becomes $+0.003$ ($p = 0.37$). For reward, which has the largest
+true effect, it changes little.
+
+The same reasoning applies to the count-matched control, where the natural implementation is to score
+the self decoder on the block it was fit on. That is not a cross-validated quantity at all, and it
+moves the self arm by $-0.024$ $\auc$ on lever pull -- enough to reverse the ordering the control
+exists to establish.
+
+We report this because the pattern generalizes beyond our dataset. Any comparison of a within-subject
+decoder against a cross-subject one is exposed to it, since only the within-subject arm can share a
+session between train and test. Where trials are not independent -- which for physiological
+recordings is the normal case -- the split must respect the recording session, or the resulting
+asymmetry will be biased in a predictable direction.
+
+\subsection{The effect does not depend on the decoder}
+\label{sec:nl}
+Every aging number so far comes from a linear readout, which could in principle be too weak to
+capture the drift-prone structure at issue. We therefore recompute the asymmetry with a 1-D
+convolutional network over time and a GRU over the frame sequence, on the full evoked window
+($-0.5$ to $+1.0$\,s, $45 \times 44$), under the same session-held-out protocol
+(Table~\ref{tab:nl}). For the two events that carry the effect it survives every decoder: lick gives
+$+0.020$, $+0.012$ and $+0.010$ and reward $+0.029$, $+0.015$ and $+0.012$ under the linear, CNN and
+GRU readouts, all significant. Lever pull is null under all three ($p \geq 0.09$). The effect is
+therefore a property of the code rather than of the linear readout.
+
+Two cautions. First, the corrected numbers do \emph{not} show capacity amplifying the asymmetry: for
+lick and reward the nonlinear estimates are \emph{smaller} than the linear one. Under a trial-level
+split the opposite appears to be true -- the CNN reaches $+0.076$ on both lever pull and tone -- but
+that is the leakage of Section~\ref{sec:protocol}, which a high-capacity model exploits more
+effectively than a linear one. Holding out sessions removes 43--73\% of the CNN's asymmetry against
+30--48\% of the linear model's on the same events. A capacity comparison run on a trial-level split
+therefore measures capacity to exploit within-session structure at least as much as capacity to
+overfit drift.
+
+Second, tone does not resolve cleanly: it is marginal under the linear readout ($p = 0.09$) but
+clearly significant under the CNN ($+0.047$, $p < 10^{-4}$) and GRU ($+0.020$, $p = 0.014$). We
+leave it as unresolved rather than counting it for or against.
+
+\begin{table}[t]\centering
+\caption{Personal-minus-pooled aging asymmetry under three decoders, per event, $n = 25$ mice, all
+with whole early sessions held out. A positive value means the personal decoder ages more; $p$ from a
+paired sign-flip permutation. The effect survives every decoder for lick and reward and is null under
+every decoder for lever pull. The nonlinear estimates are smaller than the linear ones, not larger:
+the apparent amplification with capacity reported under a trial-level split is the leakage of
+Section~\ref{sec:protocol}.}
+\label{tab:nl}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lccc}
+\toprule
+Event & Linear & 1-D CNN & GRU \\
+\midrule
+Lever-pull & $+0.006$ ($0.11$) & $+0.021$ ($0.09$) & $+0.016$ ($0.16$) \\
+Lick       & $+0.020$ ($0.004$) & $+0.012$ ($0.007$) & $+0.010$ ($0.024$) \\
+Reward     & $+0.029$ ($0.0007$) & $+0.015$ ($0.020$) & $+0.012$ ($0.006$) \\
+Tone       & $+0.016$ ($0.09$) & $+0.047$ ($<\!10^{-4}$) & $+0.020$ ($0.014$) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Discussion}
+A subject's own decoder overfits idiosyncratic features of its early sessions, some of which later
+drift. A decoder that has never seen the subject must instead rely on components of the code that are
+shared across individuals and more stable over time. The count-matched control supports this reading
+directly: at equal data, other-individual data ages less than the subject's own for the events where
+we detect the effect. Population structure is therefore not only a resource for cross-subject
+transfer, but also for temporal robustness. The early-week accuracy cost of cross-subject decoding is
+recovered over time as the pooled decoder remains stable. Unlike within-subject recalibration, this
+approach does not require newly labelled data from the individual at test time.
+
+The two events that carry the effect, lick and reward, are also the two whose personal decoders lose
+accuracy over the protocol; the two that do not, lever pull and tone, are the two where the animal's
+performance is still improving and both decoders gain. This is consistent with the account above --
+there is more subject-specific drift to avoid overfitting where drift is actually occurring -- but we
+did not predict the split in advance and treat it as an observation rather than a tested hypothesis.
+
+\textbf{Limitations.} The effect is present for two of the four events we decode, marginal for a
+third, and absent for the fourth; the pooled estimate over all 100 mouse--target pairs should be read
+with that in mind rather than as a uniform property of cortex. We measure at the mesoscale, using
+parcel-averaged activity, so whether the same result holds for single-neuron codes -- where
+representational drift is best characterized -- remains unknown. The analysis covers a two-week
+interval, discrete task events, and one species; longer horizons, graded behaviors, other species,
+and other recording modalities should be tested. Our conclusions depend on within-versus-pooled and
+early-versus-late comparisons rather than on absolute $\auc$. Although the count-matched control
+rules out training-set size and is consistent with self-overfitting, it does not identify which
+components of drift are individual-specific. Finally, tone remains unresolved: marginal under a
+linear readout and significant under both nonlinear ones, it is the one event where the choice of
+decoder changes the answer, and we do not count it either way.
 
 \subsubsection*{Reproducibility}
-Data are open (BraiDyn-BC, DANDI:001425). We release the analysis code and a streaming feature
-pipeline that reproduces every number from the public parcellated traces without downloading raw
-imaging; all splits, permutation seeds, and hyperparameters are in Section 3 and the released code.
+BraiDyn-BC is publicly available through DANDI:001425. We release the analysis code and a streaming
+feature pipeline that reproduces all reported results from the parcellated traces without downloading
+the raw imaging data. Section 3 and the released code specify all data splits, permutation seeds, and
+hyperparameters.
 
 {\small
 \bibliographystyle{plainnat}
