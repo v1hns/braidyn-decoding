@@ -55,9 +55,10 @@ number of training events fixed, the subject's own decoder ages more than one tr
 other mouse for lick ($+0.007$), reward ($+0.017$) and tone ($+0.006$). As both see equal data this
 is not a data-volume effect; it follows from not overfitting the subject's own drift-prone
 idiosyncrasies. Training on many other mice rather than one lowers aging further on all four events.
-Population pooling is thus a drift-mitigation strategy in its own right: the early-week cost of
-decoding across individuals is repaid as temporal stability. Code and a streamed-feature pipeline
-are released.
+For lick and reward the asymmetry also survives replacing the linear readout with a 1-D CNN or a GRU,
+so it is a property of the code rather than of the readout. Population pooling is thus a
+drift-mitigation strategy in its own right: the early-week cost of decoding across individuals is
+repaid as temporal stability. Code and a streamed-feature pipeline are released.
 \end{abstract}
 
 \section{Introduction}
@@ -147,8 +148,11 @@ the 44-dimensional evoked feature. This is a linear readout of the parcel-space 
 component of behavior that is linearly present in the population average, and, because it has no
 capacity to memorize spatiotemporal detail, it cannot inflate an apparent generalization difference
 through overfitting. It is also the natural comparison to prior cross-subject decoders, which are
-overwhelmingly linear \citep{melbaum2022,peterson2021}. All conditions below use this same readout, so the only
-variable across conditions is which data the decoder was trained on.
+overwhelmingly linear \citep{melbaum2022,peterson2021}. Except where Section~\ref{sec:nl} varies it deliberately,
+every condition below uses this same readout, so the only variable is which data the decoder was
+trained on. For that section we additionally train a 1-D convolutional network over time and a GRU
+over the frame sequence on the full evoked window ($-0.5$ to $+1.0$\,s, $45 \times 44$), each with a
+linear classification head, on identical events, blocks and splits.
 
 \textbf{Temporal blocks and aging.} We group each mouse's sessions into an early block (days 1--5)
 and a late block (days 11--15) and report $\auc$ under four conditions. The personal decoder is
@@ -322,6 +326,51 @@ session between train and test. Where trials are not independent -- which for ph
 recordings is the normal case -- the split must respect the recording session, or the resulting
 asymmetry will be biased in a predictable direction.
 
+\subsection{The effect does not depend on the decoder}
+\label{sec:nl}
+Every aging number so far comes from a linear readout, which could in principle be too weak to
+capture the drift-prone structure at issue. We therefore recompute the asymmetry with a 1-D
+convolutional network over time and a GRU over the frame sequence, on the full evoked window
+($-0.5$ to $+1.0$\,s, $45 \times 44$), under the same session-held-out protocol
+(Table~\ref{tab:nl}). For the two events that carry the effect it survives every decoder: lick gives
+$+0.020$, $+0.012$ and $+0.010$ and reward $+0.029$, $+0.015$ and $+0.012$ under the linear, CNN and
+GRU readouts, all significant. Lever pull is null under all three ($p \geq 0.09$). The effect is
+therefore a property of the code rather than of the linear readout.
+
+Two cautions. First, the corrected numbers do \emph{not} show capacity amplifying the asymmetry: for
+lick and reward the nonlinear estimates are \emph{smaller} than the linear one. Under a trial-level
+split the opposite appears to be true -- the CNN reaches $+0.076$ on both lever pull and tone -- but
+that is the leakage of Section~\ref{sec:protocol}, which a high-capacity model exploits more
+effectively than a linear one. Holding out sessions removes 43--73\% of the CNN's asymmetry against
+30--48\% of the linear model's on the same events. A capacity comparison run on a trial-level split
+therefore measures capacity to exploit within-session structure at least as much as capacity to
+overfit drift.
+
+Second, tone does not resolve cleanly: it is marginal under the linear readout ($p = 0.09$) but
+clearly significant under the CNN ($+0.047$, $p < 10^{-4}$) and GRU ($+0.020$, $p = 0.014$). We
+leave it as unresolved rather than counting it for or against.
+
+\begin{table}[t]\centering
+\caption{Personal-minus-pooled aging asymmetry under three decoders, per event, $n = 25$ mice, all
+with whole early sessions held out. A positive value means the personal decoder ages more; $p$ from a
+paired sign-flip permutation. The effect survives every decoder for lick and reward and is null under
+every decoder for lever pull. The nonlinear estimates are smaller than the linear ones, not larger:
+the apparent amplification with capacity reported under a trial-level split is the leakage of
+Section~\ref{sec:protocol}.}
+\label{tab:nl}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lccc}
+\toprule
+Event & Linear & 1-D CNN & GRU \\
+\midrule
+Lever-pull & $+0.006$ ($0.11$) & $+0.021$ ($0.09$) & $+0.016$ ($0.16$) \\
+Lick       & $+0.020$ ($0.004$) & $+0.012$ ($0.007$) & $+0.010$ ($0.024$) \\
+Reward     & $+0.029$ ($0.0007$) & $+0.015$ ($0.020$) & $+0.012$ ($0.006$) \\
+Tone       & $+0.016$ ($0.09$) & $+0.047$ ($<\!10^{-4}$) & $+0.020$ ($0.014$) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Discussion}
 A subject's own decoder overfits idiosyncratic features of its early sessions, some of which later
 drift. A decoder that has never seen the subject must instead rely on components of the code that are
@@ -347,10 +396,9 @@ interval, discrete task events, and one species; longer horizons, graded behavio
 and other recording modalities should be tested. Our conclusions depend on within-versus-pooled and
 early-versus-late comparisons rather than on absolute $\auc$. Although the count-matched control
 rules out training-set size and is consistent with self-overfitting, it does not identify which
-components of drift are individual-specific. Finally, we report only linear readouts here; whether a
-higher-capacity decoder changes the picture is a question our protocol makes harder rather than
-easier to answer, since such a model has more capacity to exploit exactly the within-session
-structure Section~\ref{sec:protocol} shows must be excluded.
+components of drift are individual-specific. Finally, tone remains unresolved: marginal under a
+linear readout and significant under both nonlinear ones, it is the one event where the choice of
+decoder changes the answer, and we do not count it either way.
 
 \subsubsection*{Reproducibility}
 BraiDyn-BC is publicly available through DANDI:001425. We release the analysis code and a streaming
