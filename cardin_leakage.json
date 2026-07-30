@@ -1,0 +1,110 @@
+{
+ "movement": {
+  "n_animals": 6,
+  "per_animal": [
+   {
+    "animal": "animal_1_Allen_atlas.mat",
+    "n_windows": 1139,
+    "within_shuffle": 0.5851592930335805,
+    "within_block": 0.5667328792488636,
+    "cross": 0.570002961954638
+   },
+   {
+    "animal": "animal_2_Allen_atlas.mat",
+    "n_windows": 995,
+    "within_shuffle": 0.930623973727422,
+    "within_block": 0.9336738647666589,
+    "cross": 0.9052011494252873
+   },
+   {
+    "animal": "animal_3_Allen_atlas.mat",
+    "n_windows": 956,
+    "within_shuffle": 0.8329415428426614,
+    "within_block": 0.8379816623729562,
+    "cross": 0.7322760023971123
+   },
+   {
+    "animal": "animal_4_Allen_atlas.mat",
+    "n_windows": 997,
+    "within_shuffle": 0.7156360035211267,
+    "within_block": 0.7122744585109428,
+    "cross": 0.7073792016806721
+   },
+   {
+    "animal": "animal_5_Allen_atlas.mat",
+    "n_windows": 973,
+    "within_shuffle": 0.784544362951905,
+    "within_block": 0.7701857245674013,
+    "cross": 0.728328611898017
+   },
+   {
+    "animal": "animal_6_Allen_atlas.mat",
+    "n_windows": 945,
+    "within_shuffle": 0.7928707125414975,
+    "within_block": 0.8496866244376076,
+    "cross": 0.7433217818208072
+   }
+  ],
+  "within_shuffle": 0.7736293147696989,
+  "within_block": 0.7784225356507384,
+  "cross": 0.7310849515294223,
+  "inflation": -0.0047932208810395616,
+  "gap_shuffle": 0.04254436324027653,
+  "gap_block": 0.04733758412131609,
+  "frac_inflated": 0.5
+ },
+ "arousal": {
+  "n_animals": 6,
+  "per_animal": [
+   {
+    "animal": "animal_1_Allen_atlas.mat",
+    "n_windows": 1139,
+    "within_shuffle": 0.6544211016595984,
+    "within_block": 0.6627342516543889,
+    "cross": 0.511833626244874
+   },
+   {
+    "animal": "animal_2_Allen_atlas.mat",
+    "n_windows": 995,
+    "within_shuffle": 0.8559797979797981,
+    "within_block": 0.8563156149725932,
+    "cross": 0.7263272727272727
+   },
+   {
+    "animal": "animal_3_Allen_atlas.mat",
+    "n_windows": 956,
+    "within_shuffle": 0.7293713450292397,
+    "within_block": 0.7915258027544014,
+    "cross": 0.6015808615958299
+   },
+   {
+    "animal": "animal_4_Allen_atlas.mat",
+    "n_windows": 997,
+    "within_shuffle": 0.6299278787878788,
+    "within_block": 0.7062934099442715,
+    "cross": 0.555830985915493
+   },
+   {
+    "animal": "animal_5_Allen_atlas.mat",
+    "n_windows": 973,
+    "within_shuffle": 0.7903508310540712,
+    "within_block": 0.8260594944211135,
+    "cross": 0.6900409853382348
+   },
+   {
+    "animal": "animal_6_Allen_atlas.mat",
+    "n_windows": 945,
+    "within_shuffle": 0.7657690439780531,
+    "within_block": 0.8574264001352173,
+    "cross": 0.674782507414011
+   }
+  ],
+  "within_shuffle": 0.7376366664147732,
+  "within_block": 0.7833924956469976,
+  "cross": 0.6267327065392859,
+  "inflation": -0.04575582923222441,
+  "gap_shuffle": 0.11090395987548733,
+  "gap_block": 0.15665978910771175,
+  "frac_inflated": 0.0
+ }
+}
