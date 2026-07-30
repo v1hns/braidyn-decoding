@@ -1,0 +1,199 @@
+\documentclass{article}
+
+\PassOptionsToPackage{numbers,compress}{natbib}
+\usepackage{neurips_2026}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{microtype}
+\usepackage{graphicx}
+
+\newcommand{\auc}{\mathrm{AUC}}
+
+\title{Trial-Level Cross-Validation Can Invert\\
+Within- Versus Cross-Subject Comparisons}
+
+\author{%
+  Anonymous Author(s)\\
+  Affiliation\\
+  \texttt{email}\\
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+A common design in neural decoding compares a model trained on a subject's own data against one
+trained on other subjects. The within-subject arm is usually estimated by cross-validating over
+trials. We show that when a recording session contains structure that happens to correlate with the
+label, this estimate is inflated -- and, because the cross-subject arm shares no session with its
+test data and cannot be inflated the same way, the bias falls entirely on one side of the
+comparison. In simulation with known ground truth the bias reverses the sign of the conclusion: at a
+moderate nuisance level a trial-level split reports the within-subject decoder beating cross-subject
+by $+0.026$ $\auc$ when it in fact loses by $0.008$. A label-\emph{independent} session offset
+produces no such bias, so the mechanism is specifically session-level correlation with the label, not
+session identity. Nonlinear models exploit it $1.7\times$ more than linear ones, while $\ell_2$
+strength has no effect. On a widefield calcium cohort (25 mice, DANDI:001425) the same substitution
+removes $30$--$73\%$ of a published-style asymmetry and eliminates one of four effects entirely,
+turning $+0.014$ $\auc$ at $p = 0.001$ into $+0.003$ at $p = 0.37$. On a second, independent
+widefield cohort we find no such inflation, so the bias is a conditional hazard rather than a
+universal one. We give the condition, the diagnostic, and the fix.
+\end{abstract}
+
+\section{The problem}
+Many decoding studies ask whether a model trained on other individuals can substitute for one
+trained on the subject, and answer it by comparing two accuracies: a within-subject estimate and a
+cross-subject estimate. The comparison looks symmetric. It is not.
+
+Trials recorded in one session are not independent. They share illumination and hemodynamic state,
+slow arousal, electrode or lens drift, and simple temporal autocorrelation. A within-subject decoder
+cross-validated over trials can therefore be trained on part of a session and tested on the rest of
+the same session. A cross-subject decoder is trained on other individuals entirely and never shares
+a session with its test data. Whatever advantage the shared session confers accrues to one arm only,
+and therefore lands directly on the difference the study reports.
+
+This note establishes three things: the precise structure that causes the bias, how large it gets,
+and when it does \emph{not} occur.
+
+\section{The mechanism, with ground truth}
+\label{sec:sim}
+We simulate $12$ subjects $\times$ $5$ sessions $\times$ $100$ trials in $44$ dimensions:
+\begin{equation}
+x = \delta\, y\, w \;+\; \gamma\, y\, z_{s,k} \;+\; u_s \;+\; v_{s,k} \;+\; \varepsilon,
+\qquad \varepsilon \sim \mathcal{N}(0, I).
+\end{equation}
+Here $w$ is a decodable direction shared by all subjects, $u_s$ a subject offset, $v_{s,k}$ a
+per-session offset of scale $\sigma$, and $z_{s,k}$ a direction drawn fresh for each session that
+correlates with the label \emph{within that session only}. Labels are balanced Bernoulli, so
+$v_{s,k}$ carries no label information by construction and any accuracy attributable to it is
+leakage. We compare three estimators: within-subject with a trial-level 5-fold, within-subject with
+leave-one-session-out, and cross-subject (train on the other 11 subjects).
+
+\textbf{Session identity alone leaks nothing.} Sweeping $\sigma$ from $0$ to $2$ with $\gamma = 0$
+produces inflation between $-0.014$ and $+0.012$ $\auc$, i.e.\ nothing systematic. This is worth
+stating because it is the intuitive story and it is wrong: a constant offset shifts a session's
+cluster without moving the optimal boundary, so a linear decoder gains nothing from having seen the
+session before.
+
+\textbf{Session-level label correlation does.} Holding $\sigma = 0.5$ and sweeping $\gamma$
+(Table~\ref{tab:sim}), inflation is absent at $\gamma \leq 0.5$ and then grows sharply. The
+consequence is not merely that a number is too large. At $\gamma = 1$ the trial-level split reports
+the within-subject decoder ahead of cross-subject by $+0.026$ $\auc$; leave-one-session-out shows it
+is behind by $0.008$. The bias reverses the sign of the reported comparison. At $\gamma = 2$ it
+manufactures $+0.115$ from a true $-0.020$.
+
+\begin{table}[t]\centering
+\caption{Simulation with known ground truth ($\sigma = 0.5$, $T = 100$, $\ell_2$ logistic).
+\emph{Inflation} is within-trial minus within-session. The last two columns are the within-minus-cross
+gap a study would report under each protocol; they differ in sign from $\gamma = 1$ onward.}
+\label{tab:sim}
+\begin{tabular}{lccccc}
+\toprule
+$\gamma$ & within (trial) & within (session) & cross & inflation & reported gap: trial / session \\
+\midrule
+0.00 & 0.596 & 0.610 & 0.621 & $-0.014$ & $-0.025$ / $-0.011$ \\
+0.25 & 0.601 & 0.613 & 0.620 & $-0.012$ & $-0.019$ / $-0.007$ \\
+0.50 & 0.611 & 0.613 & 0.619 & $-0.003$ & $-0.008$ / $-0.005$ \\
+1.00 & 0.642 & 0.608 & 0.616 & $\mathbf{+0.034}$ & $\mathbf{+0.026}$ / $\mathbf{-0.008}$ \\
+2.00 & 0.723 & 0.589 & 0.609 & $\mathbf{+0.135}$ & $\mathbf{+0.115}$ / $\mathbf{-0.020}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Model class matters; regularization does not.} At $\gamma = 1$, inflation is $+0.0338$,
+$+0.0337$ and $+0.0338$ for $\ell_2$ logistic regression at $C = 0.01$, $0.5$ and $100$ -- identical
+to four decimals across four orders of magnitude of penalty. A one-hidden-layer network on the same
+data inflates by $+0.0564$, $1.7\times$ more. The quantity that matters is the flexibility of the
+model class, not how hard it is penalized within a class. A capacity comparison run on a trial-level
+split therefore confounds capacity to fit the signal with capacity to exploit the leak.
+
+\section{A real instance}
+\label{sec:braidyn}
+BraiDyn-BC \citep{kondo2025} (DANDI:001425) provides 25 mice $\times$ $\sim$15 daily sessions of
+cortex-wide widefield $\Delta F/F$ in 44 Allen-atlas parcels. We decode four task events and measure
+the personal-minus-pooled aging asymmetry -- exactly the within- versus cross-subject shape described
+above -- under both protocols on identical features.
+
+Substituting leave-one-session-out for the trial-level split lowers the within-subject arm by
+$+0.013$, $+0.010$, $+0.009$ and $+0.000$ $\auc$ across the four events, and leaves the cross-subject
+arm untouched, as predicted. The effect on the reported comparison (Table~\ref{tab:braidyn}) is
+substantial: $30$--$73\%$ of the asymmetry disappears, and for lever pull the entire effect does,
+turning $+0.014$ at $p = 0.001$ into $+0.003$ at $p = 0.37$. The remaining events survive at reduced
+magnitude.
+
+The capacity prediction of Section~\ref{sec:sim} also holds here. Holding out sessions removes
+$43$--$73\%$ of the CNN's asymmetry against $30$--$48\%$ of the linear model's on the same events, so
+the higher-capacity model was the larger beneficiary of the leak -- and a naive reading of the
+trial-split numbers would have concluded that the effect \emph{grows} with capacity, which it does
+not.
+
+\begin{table}[t]\centering
+\caption{BraiDyn-BC, $n = 25$ mice. Same features, same events, same statistic; only the split
+differs.}
+\label{tab:braidyn}
+\begin{tabular}{lcc}
+\toprule
+Event & trial-level split & session-held-out \\
+\midrule
+Lever-pull & $+0.014$ ($p = 0.001$) & $+0.003$ ($p = 0.37$) \\
+Lick       & $+0.028$ ($p = 0.0002$) & $+0.020$ ($p = 0.002$) \\
+Reward     & $+0.032$ ($p = 0.0001$) & $+0.029$ ($p = 0.0005$) \\
+Tone       & $+0.022$ ($p = 0.005$) & $+0.015$ ($p = 0.08$) \\
+\midrule
+Pooled     & $+0.024$ & $+0.017$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{A cohort where it does not occur}
+\label{sec:cardin}
+We ran the same substitution on an independent widefield cohort \citep{benisty2024}: a different
+laboratory, a different parcellation (23 CCFv3 regions), spontaneous rather than cued behavior, and
+locomotion and pupil-derived arousal as targets. Each animal is one continuous recording, so the
+analogue of a session-held-out split is a contiguous-block split.
+
+We found no inflation. For locomotion the within-subject arm changed by $-0.005$ $\auc$ and for
+arousal by $-0.046$; in both cases the shuffled estimate was \emph{lower} than the blocked one, and
+for arousal this held in $6$ of $6$ animals. The within-minus-cross gap was accordingly not
+overstated in this cohort.
+
+We report this because it bounds the claim. The bias is not an automatic consequence of splitting
+trials; it requires the session to contain label-correlated structure for the decoder to absorb.
+Section~\ref{sec:sim} makes that condition explicit, and a cohort can fail to meet it.
+
+\section{Recommendation}
+Hold out whole recording sessions when estimating the within-subject arm of a within- versus
+cross-subject comparison. The cost is a slightly noisier estimate; the benefit is that the two arms
+are exposed to the same information.
+
+Because the hazard is conditional, we also suggest reporting both numbers when the comparison is
+load-bearing. The difference between them is itself the diagnostic: it is an estimate of how much
+session-level label-correlated structure the data contain, costs one extra fit to obtain, and would
+have flagged the effect in Section~\ref{sec:braidyn} immediately.
+
+\textbf{Limitations.} We have one positive cohort and one negative one, so we cannot say how common
+the hazard is in practice, only that it is real, that it can invert a conclusion, and that it is not
+universal. Our account of why the second cohort is unaffected is post hoc: we predicted inflation
+there and did not find it, and while the mechanism in Section~\ref{sec:sim} is consistent with the
+null, we have not independently measured label-correlated session structure in either cohort and
+shown it differs. A direct measurement of $\gamma$ in real data, and a survey of published
+within-versus-cross designs, are the natural next steps.
+
+{\small
+\bibliographystyle{plainnat}
+\begin{thebibliography}{9}
+\bibitem[Benisty et al.(2024)]{benisty2024} H.~Benisty et al. Rapid fluctuations in functional
+connectivity of cortical networks encode spontaneous behavior. \emph{Nature Neuroscience}, 27, 2024.
+figshare 175317.
+\bibitem[Kondo et al.(2025)]{kondo2025} A.~Kondo et al. BraiDyn-BC: a cortex-wide widefield calcium
+imaging dataset during a cued lever-pull operant task. \emph{Scientific Data}, 12, 2025.
+DANDI:001425.
+\end{thebibliography}
+}
+
+\end{document}
