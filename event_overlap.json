@@ -1,0 +1,685 @@
+{
+ "n_sessions": 8,
+ "sessions": [
+  {
+   "mouse": "sub-VG1-GC#125",
+   "day": 9,
+   "rate": 29.94049454628519,
+   "counts": {
+    "state_lever": 672,
+    "lick": 569,
+    "reward": 47,
+    "tone": 87
+   },
+   "latency_s": {
+    "state_lever->lick": {
+     "median": -0.03339958190917969,
+     "median_abs": 0.13359832763671875,
+     "frac_within_window": 0.6696428571428571
+    },
+    "state_lever->reward": {
+     "median": -1.9371757507324219,
+     "median_abs": 10.570967674255371,
+     "frac_within_window": 0.06994047619047619
+    },
+    "state_lever->tone": {
+     "median": -1.3359832763671875,
+     "median_abs": 6.8970136642456055,
+     "frac_within_window": 0.047619047619047616
+    },
+    "lick->state_lever": {
+     "median": -0.03339958190917969,
+     "median_abs": 0.06679916381835938,
+     "frac_within_window": 0.8295254833040422
+    },
+    "lick->reward": {
+     "median": -1.06878662109375,
+     "median_abs": 8.316495895385742,
+     "frac_within_window": 0.07908611599297012
+    },
+    "lick->tone": {
+     "median": -1.3025836944580078,
+     "median_abs": 4.943138122558594,
+     "frac_within_window": 0.07908611599297012
+    },
+    "reward->state_lever": {
+     "median": -0.03339958190917969,
+     "median_abs": 0.03339958190917969,
+     "frac_within_window": 1.0
+    },
+    "reward->lick": {
+     "median": -0.03339958190917969,
+     "median_abs": 0.06679916381835938,
+     "frac_within_window": 0.9787234042553191
+    },
+    "reward->tone": {
+     "median": -0.2671966552734375,
+     "median_abs": 0.2671966552734375,
+     "frac_within_window": 0.6808510638297872
+    },
+    "tone->state_lever": {
+     "median": 0.534393310546875,
+     "median_abs": 0.8015899658203125,
+     "frac_within_window": 0.5402298850574713
+    },
+    "tone->lick": {
+     "median": 0.4675941467285156,
+     "median_abs": 0.534393310546875,
+     "frac_within_window": 0.6781609195402298
+    },
+    "tone->reward": {
+     "median": 0.7013912200927734,
+     "median_abs": 0.8349895477294922,
+     "frac_within_window": 0.5287356321839081
+    }
+   },
+   "pos_contam": {
+    "state_lever": 0.6741071428571429,
+    "lick": 0.859402460456942,
+    "reward": 1.0,
+    "tone": 0.7011494252873564
+   },
+   "neg_contam": {
+    "state_lever": 0.4375,
+    "lick": 0.2651162790697674,
+    "reward": 0.7021276595744681,
+    "tone": 0.5862068965517241
+   }
+  },
+  {
+   "mouse": "sub-VG1-GC#117",
+   "day": 8,
+   "rate": 29.94049454628519,
+   "counts": {
+    "state_lever": 642,
+    "lick": 482,
+    "reward": 52,
+    "tone": 74
+   },
+   "latency_s": {
+    "state_lever->lick": {
+     "median": 0.06679916381835938,
+     "median_abs": 0.16699790954589844,
+     "frac_within_window": 0.6744548286604362
+    },
+    "state_lever->reward": {
+     "median": -1.06878662109375,
+     "median_abs": 10.036574363708496,
+     "frac_within_window": 0.08099688473520249
+    },
+    "state_lever->tone": {
+     "median": -0.5844926834106445,
+     "median_abs": 7.565005302429199,
+     "frac_within_window": 0.0778816199376947
+    },
+    "lick->state_lever": {
+     "median": -0.10019874572753906,
+     "median_abs": 0.13359832763671875,
+     "frac_within_window": 0.9190871369294605
+    },
+    "lick->reward": {
+     "median": -1.0353870391845703,
+     "median_abs": 8.667191505432129,
+     "frac_within_window": 0.1016597510373444
+    },
+    "lick->tone": {
+     "median": -1.2357845306396484,
+     "median_abs": 6.546318054199219,
+     "frac_within_window": 0.07053941908713693
+    },
+    "reward->state_lever": {
+     "median": -0.10019874572753906,
+     "median_abs": 0.10019874572753906,
+     "frac_within_window": 1.0
+    },
+    "reward->lick": {
+     "median": 0.0,
+     "median_abs": 0.06679916381835938,
+     "frac_within_window": 0.9807692307692307
+    },
+    "reward->tone": {
+     "median": -0.3339958190917969,
+     "median_abs": 0.3339958190917969,
+     "frac_within_window": 0.6538461538461539
+    },
+    "tone->state_lever": {
+     "median": 0.3005962371826172,
+     "median_abs": 0.3506956100463867,
+     "frac_within_window": 0.8648648648648649
+    },
+    "tone->lick": {
+     "median": 0.5009937286376953,
+     "median_abs": 0.5009937286376953,
+     "frac_within_window": 0.8108108108108109
+    },
+    "tone->reward": {
+     "median": 0.3339958190917969,
+     "median_abs": 0.534393310546875,
+     "frac_within_window": 0.7027027027027027
+    }
+   },
+   "pos_contam": {
+    "state_lever": 0.67601246105919,
+    "lick": 0.9336099585062241,
+    "reward": 1.0,
+    "tone": 0.8648648648648649
+   },
+   "neg_contam": {
+    "state_lever": 0.043478260869565216,
+    "lick": 0.33488372093023255,
+    "reward": 0.5,
+    "tone": 0.47297297297297297
+   }
+  },
+  {
+   "mouse": "sub-VG1-GC#105",
+   "day": 9,
+   "rate": 29.94049454628519,
+   "counts": {
+    "state_lever": 443,
+    "lick": 423,
+    "reward": 109,
+    "tone": 208
+   },
+   "latency_s": {
+    "state_lever->lick": {
+     "median": 0.03339958190917969,
+     "median_abs": 0.06679916381835938,
+     "frac_within_window": 0.7268623024830699
+    },
+    "state_lever->reward": {
+     "median": 0.36739540100097656,
+     "median_abs": 4.5423431396484375,
+     "frac_within_window": 0.24604966139954854
+    },
+    "state_lever->tone": {
+     "median": -0.16699790954589844,
+     "median_abs": 3.2397594451904297,
+     "frac_within_window": 0.30699774266365687
+    },
+    "lick->state_lever": {
+     "median": -0.06679916381835938,
+     "median_abs": 0.06679916381835938,
+     "frac_within_window": 0.7801418439716312
+    },
+    "lick->reward": {
+     "median": 0.3005962371826172,
+     "median_abs": 4.408744812011719,
+     "frac_within_window": 0.2576832151300236
+    },
+    "lick->tone": {
+     "median": -0.2337970733642578,
+     "median_abs": 1.502981185913086,
+     "frac_within_window": 0.3309692671394799
+    },
+    "reward->state_lever": {
+     "median": -0.40079498291015625,
+     "median_abs": 0.40079498291015625,
+     "frac_within_window": 1.0
+    },
+    "reward->lick": {
+     "median": -0.3339958190917969,
+     "median_abs": 0.3339958190917969,
+     "frac_within_window": 0.981651376146789
+    },
+    "reward->tone": {
+     "median": -0.5677928924560547,
+     "median_abs": 0.5677928924560547,
+     "frac_within_window": 0.12844036697247707
+    },
+    "tone->state_lever": {
+     "median": 0.16699790954589844,
+     "median_abs": 0.20039749145507812,
+     "frac_within_window": 0.6634615384615384
+    },
+    "tone->lick": {
+     "median": 0.2337970733642578,
+     "median_abs": 0.2337970733642578,
+     "frac_within_window": 0.6778846153846154
+    },
+    "tone->reward": {
+     "median": 0.5677928924560547,
+     "median_abs": 0.6512918472290039,
+     "frac_within_window": 0.5240384615384616
+    }
+   },
+   "pos_contam": {
+    "state_lever": 0.7607223476297968,
+    "lick": 0.8250591016548463,
+    "reward": 1.0,
+    "tone": 0.7403846153846154
+   },
+   "neg_contam": {
+    "state_lever": 0.3548387096774194,
+    "lick": 0.31202046035805625,
+    "reward": 0.3302752293577982,
+    "tone": 0.3798076923076923
+   }
+  },
+  {
+   "mouse": "sub-VG1-GC#116",
+   "day": 8,
+   "rate": 29.94049454628519,
+   "counts": {
+    "state_lever": 771,
+    "lick": 361,
+    "reward": 43,
+    "tone": 75
+   },
+   "latency_s": {
+    "state_lever->lick": {
+     "median": -0.16699790954589844,
+     "median_abs": 3.506956100463867,
+     "frac_within_window": 0.3216601815823606
+    },
+    "state_lever->reward": {
+     "median": -1.3359832763671875,
+     "median_abs": 11.389257431030273,
+     "frac_within_window": 0.055771725032425425
+    },
+    "state_lever->tone": {
+     "median": -1.3025836944580078,
+     "median_abs": 7.347908020019531,
+     "frac_within_window": 0.08430609597924774
+    },
+    "lick->state_lever": {
+     "median": 0.03339958190917969,
+     "median_abs": 0.3005962371826172,
+     "frac_within_window": 0.7922437673130194
+    },
+    "lick->reward": {
+     "median": -2.237771987915039,
+     "median_abs": 4.24174690246582,
+     "frac_within_window": 0.12188365650969529
+    },
+    "lick->tone": {
+     "median": -2.371370315551758,
+     "median_abs": 3.4735565185546875,
+     "frac_within_window": 0.20498614958448755
+    },
+    "reward->state_lever": {
+     "median": -0.10019874572753906,
+     "median_abs": 0.10019874572753906,
+     "frac_within_window": 0.9767441860465116
+    },
+    "reward->lick": {
+     "median": -0.13359832763671875,
+     "median_abs": 0.13359832763671875,
+     "frac_within_window": 1.0
+    },
+    "reward->tone": {
+     "median": -0.36739540100097656,
+     "median_abs": 0.36739540100097656,
+     "frac_within_window": 0.7906976744186046
+    },
+    "tone->state_lever": {
+     "median": 0.3005962371826172,
+     "median_abs": 0.3005962371826172,
+     "frac_within_window": 0.9733333333333334
+    },
+    "tone->lick": {
+     "median": 0.16699790954589844,
+     "median_abs": 0.16699790954589844,
+     "frac_within_window": 0.9866666666666667
+    },
+    "tone->reward": {
+     "median": 0.43419456481933594,
+     "median_abs": 0.534393310546875,
+     "frac_within_window": 0.5733333333333334
+    }
+   },
+   "pos_contam": {
+    "state_lever": 0.3463035019455253,
+    "lick": 0.8448753462603878,
+    "reward": 1.0,
+    "tone": 0.9866666666666667
+   },
+   "neg_contam": {
+    "state_lever": 0.2564102564102564,
+    "lick": 0.5373961218836565,
+    "reward": 0.5348837209302325,
+    "tone": 0.6933333333333334
+   }
+  },
+  {
+   "mouse": "sub-VG1-GC#109",
+   "day": 8,
+   "rate": 29.94049454628519,
+   "counts": {
+    "state_lever": 662,
+    "lick": 493,
+    "reward": 67,
+    "tone": 166
+   },
+   "latency_s": {
+    "state_lever->lick": {
+     "median": -0.06679916381835938,
+     "median_abs": 0.4675941467285156,
+     "frac_within_window": 0.5392749244712991
+    },
+    "state_lever->reward": {
+     "median": -1.6365795135498047,
+     "median_abs": 6.37932014465332,
+     "frac_within_window": 0.10120845921450151
+    },
+    "state_lever->tone": {
+     "median": -1.2524843215942383,
+     "median_abs": 4.041349411010742,
+     "frac_within_window": 0.13293051359516617
+    },
+    "lick->state_lever": {
+     "median": 0.0,
+     "median_abs": 0.16699790954589844,
+     "frac_within_window": 0.7667342799188641
+    },
+    "lick->reward": {
+     "median": 0.03339958190917969,
+     "median_abs": 6.6799163818359375,
+     "frac_within_window": 0.13387423935091278
+    },
+    "lick->tone": {
+     "median": -0.2337970733642578,
+     "median_abs": 2.5383682250976562,
+     "frac_within_window": 0.281947261663286
+    },
+    "reward->state_lever": {
+     "median": -0.06679916381835938,
+     "median_abs": 0.06679916381835938,
+     "frac_within_window": 1.0
+    },
+    "reward->lick": {
+     "median": -0.10019874572753906,
+     "median_abs": 0.10019874572753906,
+     "frac_within_window": 0.8955223880597015
+    },
+    "reward->tone": {
+     "median": -0.2671966552734375,
+     "median_abs": 0.2671966552734375,
+     "frac_within_window": 0.8507462686567164
+    },
+    "tone->state_lever": {
+     "median": 0.2337970733642578,
+     "median_abs": 0.3506956100463867,
+     "frac_within_window": 0.6566265060240963
+    },
+    "tone->lick": {
+     "median": 0.20039749145507812,
+     "median_abs": 0.2337970733642578,
+     "frac_within_window": 0.8433734939759037
+    },
+    "tone->reward": {
+     "median": 0.3005962371826172,
+     "median_abs": 8.015899658203125,
+     "frac_within_window": 0.39156626506024095
+    }
+   },
+   "pos_contam": {
+    "state_lever": 0.5589123867069486,
+    "lick": 0.8438133874239351,
+    "reward": 1.0,
+    "tone": 0.8855421686746988
+   },
+   "neg_contam": {
+    "state_lever": 0.41295546558704455,
+    "lick": 0.3763440860215054,
+    "reward": 0.6567164179104478,
+    "tone": 0.5602409638554217
+   }
+  },
+  {
+   "mouse": "sub-VG1-GC#124",
+   "day": 9,
+   "rate": 29.94049454628519,
+   "counts": {
+    "state_lever": 726,
+    "lick": 586,
+    "reward": 52,
+    "tone": 72
+   },
+   "latency_s": {
+    "state_lever->lick": {
+     "median": -0.03339958190917969,
+     "median_abs": 0.3339958190917969,
+     "frac_within_window": 0.5991735537190083
+    },
+    "state_lever->reward": {
+     "median": 0.0,
+     "median_abs": 10.67116641998291,
+     "frac_within_window": 0.07162534435261708
+    },
+    "state_lever->tone": {
+     "median": -0.5009937286376953,
+     "median_abs": 8.249696731567383,
+     "frac_within_window": 0.05234159779614325
+    },
+    "lick->state_lever": {
+     "median": 0.0,
+     "median_abs": 0.2337970733642578,
+     "frac_within_window": 0.8242320819112628
+    },
+    "lick->reward": {
+     "median": -1.2023849487304688,
+     "median_abs": 6.713315963745117,
+     "frac_within_window": 0.10580204778156997
+    },
+    "lick->tone": {
+     "median": -1.2691841125488281,
+     "median_abs": 5.009937286376953,
+     "frac_within_window": 0.12286689419795221
+    },
+    "reward->state_lever": {
+     "median": -0.06679916381835938,
+     "median_abs": 0.06679916381835938,
+     "frac_within_window": 1.0
+    },
+    "reward->lick": {
+     "median": -0.1168985366821289,
+     "median_abs": 0.2671966552734375,
+     "frac_within_window": 0.9230769230769231
+    },
+    "reward->tone": {
+     "median": -0.3506956100463867,
+     "median_abs": 0.3506956100463867,
+     "frac_within_window": 0.5961538461538461
+    },
+    "tone->state_lever": {
+     "median": 0.4174947738647461,
+     "median_abs": 0.4675941467285156,
+     "frac_within_window": 0.8194444444444444
+    },
+    "tone->lick": {
+     "median": 0.16699790954589844,
+     "median_abs": 0.2337970733642578,
+     "frac_within_window": 0.9861111111111112
+    },
+    "tone->reward": {
+     "median": 0.5009937286376953,
+     "median_abs": 0.5677928924560547,
+     "frac_within_window": 0.7222222222222222
+    }
+   },
+   "pos_contam": {
+    "state_lever": 0.6060606060606061,
+    "lick": 0.8686006825938567,
+    "reward": 1.0,
+    "tone": 0.9861111111111112
+   },
+   "neg_contam": {
+    "state_lever": 0.21782178217821782,
+    "lick": 0.6091549295774648,
+    "reward": 0.6153846153846154,
+    "tone": 0.6527777777777778
+   }
+  },
+  {
+   "mouse": "sub-VG1-GC#122",
+   "day": 7,
+   "rate": 29.94049454628519,
+   "counts": {
+    "state_lever": 591,
+    "lick": 702,
+    "reward": 68,
+    "tone": 127
+   },
+   "latency_s": {
+    "state_lever->lick": {
+     "median": -0.03339958190917969,
+     "median_abs": 0.10019874572753906,
+     "frac_within_window": 0.8697123519458545
+    },
+    "state_lever->reward": {
+     "median": 0.10019874572753906,
+     "median_abs": 6.6799163818359375,
+     "frac_within_window": 0.11505922165820642
+    },
+    "state_lever->tone": {
+     "median": -0.6679916381835938,
+     "median_abs": 4.475543975830078,
+     "frac_within_window": 0.10490693739424704
+    },
+    "lick->state_lever": {
+     "median": 0.0,
+     "median_abs": 0.13359832763671875,
+     "frac_within_window": 0.7763532763532763
+    },
+    "lick->reward": {
+     "median": -1.0520868301391602,
+     "median_abs": 4.809539794921875,
+     "frac_within_window": 0.10113960113960115
+    },
+    "lick->tone": {
+     "median": -1.2357845306396484,
+     "median_abs": 3.6739540100097656,
+     "frac_within_window": 0.1168091168091168
+    },
+    "reward->state_lever": {
+     "median": -0.13359832763671875,
+     "median_abs": 0.13359832763671875,
+     "frac_within_window": 1.0
+    },
+    "reward->lick": {
+     "median": -0.16699790954589844,
+     "median_abs": 0.16699790954589844,
+     "frac_within_window": 1.0
+    },
+    "reward->tone": {
+     "median": -0.43419456481933594,
+     "median_abs": 0.43419456481933594,
+     "frac_within_window": 0.6029411764705882
+    },
+    "tone->state_lever": {
+     "median": 0.36739540100097656,
+     "median_abs": 0.5009937286376953,
+     "frac_within_window": 0.6692913385826772
+    },
+    "tone->lick": {
+     "median": 0.3339958190917969,
+     "median_abs": 0.3339958190917969,
+     "frac_within_window": 0.7952755905511811
+    },
+    "tone->reward": {
+     "median": 0.5009937286376953,
+     "median_abs": 0.7681903839111328,
+     "frac_within_window": 0.5354330708661418
+    }
+   },
+   "pos_contam": {
+    "state_lever": 0.8900169204737732,
+    "lick": 0.8190883190883191,
+    "reward": 1.0,
+    "tone": 0.8110236220472441
+   },
+   "neg_contam": {
+    "state_lever": 0.4520547945205479,
+    "lick": 0.2608695652173913,
+    "reward": 0.5294117647058824,
+    "tone": 0.5196850393700787
+   }
+  },
+  {
+   "mouse": "sub-VG1-GC#119",
+   "day": 7,
+   "rate": 29.94049454628519,
+   "counts": {
+    "state_lever": 572,
+    "lick": 568,
+    "reward": 59,
+    "tone": 165
+   },
+   "latency_s": {
+    "state_lever->lick": {
+     "median": -0.03339958190917969,
+     "median_abs": 0.16699790954589844,
+     "frac_within_window": 0.7202797202797203
+    },
+    "state_lever->reward": {
+     "median": -0.9017887115478516,
+     "median_abs": 7.264409065246582,
+     "frac_within_window": 0.10139860139860139
+    },
+    "state_lever->tone": {
+     "median": -1.3025836944580078,
+     "median_abs": 4.25844669342041,
+     "frac_within_window": 0.06993006993006994
+    },
+    "lick->state_lever": {
+     "median": 0.0,
+     "median_abs": 0.1502981185913086,
+     "frac_within_window": 0.778169014084507
+    },
+    "lick->reward": {
+     "median": -1.06878662109375,
+     "median_abs": 6.295821189880371,
+     "frac_within_window": 0.09507042253521127
+    },
+    "lick->tone": {
+     "median": -1.1021862030029297,
+     "median_abs": 3.5737552642822266,
+     "frac_within_window": 0.10915492957746478
+    },
+    "reward->state_lever": {
+     "median": -0.06679916381835938,
+     "median_abs": 0.06679916381835938,
+     "frac_within_window": 0.9661016949152542
+    },
+    "reward->lick": {
+     "median": -0.06679916381835938,
+     "median_abs": 0.06679916381835938,
+     "frac_within_window": 0.864406779661017
+    },
+    "reward->tone": {
+     "median": -0.43419456481933594,
+     "median_abs": 0.4675941467285156,
+     "frac_within_window": 0.5084745762711864
+    },
+    "tone->state_lever": {
+     "median": 0.7681903839111328,
+     "median_abs": 1.3025836944580078,
+     "frac_within_window": 0.3939393939393939
+    },
+    "tone->lick": {
+     "median": 0.5009937286376953,
+     "median_abs": 0.9017887115478516,
+     "frac_within_window": 0.49696969696969695
+    },
+    "tone->reward": {
+     "median": 0.43419456481933594,
+     "median_abs": 8.149497985839844,
+     "frac_within_window": 0.3333333333333333
+    }
+   },
+   "pos_contam": {
+    "state_lever": 0.7447552447552448,
+    "lick": 0.8257042253521126,
+    "reward": 0.9830508474576272,
+    "tone": 0.5454545454545454
+   },
+   "neg_contam": {
+    "state_lever": 0.38153846153846155,
+    "lick": 0.2796352583586626,
+    "reward": 0.576271186440678,
+    "tone": 0.5878787878787879
+   }
+  }
+ ]
+}
