@@ -34,31 +34,19 @@ Age Slower Than Your Own}
 \maketitle
 
 \begin{abstract}
-Cortical representations drift; a decoder fit to one animal's neural activity slowly loses accuracy
-on that animal over days, even with unchanged behavior. The standard solution is periodic
-recalibration on fresh data from the subject; we report a different form of robustness. On the open
-BraiDyn-BC cohort (25 mice, cortex-wide widefield $\Delta F/F$ parcellated into 44 Allen-atlas
-regions, a $\sim$15-day operant protocol), we decode four task events and compare, per mouse, how
-much accuracy is lost over two weeks by (i) the mouse's own early-week decoder and (ii) a decoder
-pooled over the other 24 mice's early-week data. Trials recorded in one session share imaging
-conditions, hemodynamic state and slow arousal, so every within-subject estimate here holds out
-whole sessions rather than trials; splitting at the trial level inflates the personal decoder, and
-therefore the asymmetry itself, by up to $0.013$ $\auc$. Under the session-held-out protocol the
-pooled decoder ages less: the personal-minus-pooled asymmetry is $+0.017$ $\auc$
-($p = 5 \times 10^{-5}$; the own decoder ages quicker in 73 of 100 mouse--target pairs). The effect
-is carried by two of the four events, lick ($+0.020$, $p = 0.002$) and reward ($+0.029$,
-$p = 0.0005$), while tone is marginal ($+0.015$, $p = 0.08$) and lever pull is null ($+0.003$,
-$p = 0.37$). A day-by-day regression across the full 15-day protocol independently finds a narrowing
-personal-versus-pooled gap for exactly those two events, so two analyses with different estimators
-agree on which events carry the effect. A count-matched control isolates the cause: holding the
-number of training events fixed, the subject's own decoder ages more than one trained on a single
-other mouse for lick ($+0.007$), reward ($+0.017$) and tone ($+0.006$). As both see equal data this
-is not a data-volume effect; it follows from not overfitting the subject's own drift-prone
-idiosyncrasies. Training on many other mice rather than one lowers aging further on all four events.
-For lick and reward the asymmetry also survives replacing the linear readout with a 1-D CNN or a GRU,
-so it is a property of the code rather than of the readout. Population pooling is thus a
-drift-mitigation strategy in its own right: the early-week cost of decoding across individuals is
-repaid as temporal stability. Code and a streamed-feature pipeline are released.
+A decoder fit to one animal's cortex loses accuracy on that animal over days, and the usual remedy is
+to recalibrate it on fresh data from the same subject. We report a different kind of robustness: a
+decoder built from \emph{other} individuals ages more slowly than the subject's own. On the open
+BraiDyn-BC cohort (25 mice, 44 Allen-atlas cortical parcels, a $\sim$15-day operant protocol) we
+decode four task events and measure, per mouse, the $\auc$ lost over two weeks by its own early-week
+decoder versus one pooled over the other 24 mice. The personal decoder ages more by $+0.017$ $\auc$
+($p = 5 \times 10^{-5}$, 73 of 100 mouse--target pairs), carried by reward and lick; tone is marginal
+and lever pull null. At matched training-event count a decoder from a single other mouse still ages
+less, so this is not a data-volume effect but a consequence of not overfitting the subject's
+drift-prone idiosyncrasies; it survives a 1-D CNN and a GRU as well. One caveat is load-bearing:
+trials within a session are not independent, so splitting at the trial level inflates the personal
+decoder alone, by up to $0.013$ $\auc$ -- enough to manufacture the entire lever-pull effect. All
+estimates here hold out whole sessions. Code and a streamed-feature pipeline are released.
 \end{abstract}
 
 \section{Introduction}
