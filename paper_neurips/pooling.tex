@@ -324,6 +324,17 @@ remains stable. Unlike within-subject recalibration, this requires no newly labe
 individual at test time -- which is the practical point, since obtaining that data is the expensive
 part of deploying a decoder over months.
 
+The effect is small in absolute terms, and we think it is worth being explicit about why we believe
+it anyway. It rests on 25 animals and 357 recording sessions, which is a large cohort for a
+longitudinal cortex-wide study, and it is supported by four checks that are not variations on one
+analysis. A two-block contrast and a day-by-day regression over all fifteen sessions are different
+estimators and select the same events. The count-matched control fixes the training-set size, so the
+result cannot be a data-volume artifact. Replacing the linear readout with a 1-D CNN or a GRU leaves
+it in place, so it is not an artifact of a weak decoder. And holding out whole sessions rather than
+trials removes an inflation large enough to eliminate one of the four events entirely -- the effect
+reported here is what remains after that correction, not before it. Each of these could have removed
+the result and none did.
+
 \textbf{Limitations.} The clearest limitation is what the four events are. They are not four
 independent behaviors but four thresholded channels of one cued lever-pull trial, overlapping to the
 point where $100\%$ of reward windows also contain licking, and differing tenfold in event count. We
