@@ -103,16 +103,31 @@ from other subjects can provide that stability.
 readout through manifold alignment \citep{melbaum2022}, contrastive embeddings \citep{schneider2023},
 and, on this cohort, atlas-aligned foundation models \citep{wicat2026}. Multi-participant pooling can
 also reduce overfitting: HTNet, for example, pools participant data to avoid fitting a decoder to a
-small single-subject sample \citep{peterson2021}. Our question differs in two ways. Primarily, prior
-work measures accuracy or transfer at a fixed time, while we look at how that accuracy changes over
-days, to see whether pooled decoders age more slowly. Further, we keep the training-set size fixed
-with the count-matched control, hence being able to delegate the relevant overfitting not to limited
-data but to idiosyncratic features that cause drift.
+small single-subject sample \citep{peterson2021}, and pooled pretraining across 83 animals followed
+by fine-tuning on held-out animals reaches state-of-the-art encoding and decoding on a standardized
+cross-subject cohort \citep{neds2025}. Our question differs in two ways. Primarily, prior work
+measures accuracy or transfer at a fixed time, while we look at how that accuracy changes over days,
+to see whether pooled decoders age more slowly. Further, we keep the training-set size fixed with the
+count-matched control, hence being able to delegate the relevant overfitting not to limited data but
+to idiosyncratic features that cause drift.
+
+The closest work to ours combines both axes: Meta-AlignNN \citep{metaalign2025} uses the consistency
+of neural population dynamics across individuals to build a decoder that remains stable across
+subjects, time and tasks, and demonstrates it over two years in three monkeys. That work and ours
+point in the same practical direction, and differ in kind rather than in topic. Meta-AlignNN proposes
+a method for achieving stability; we measure whether a difference in aging rate exists at all between
+a decoder trained on the subject and one trained on others, with the training-set size held fixed so
+that the comparison isolates whose data the decoder saw. A measured effect of this kind is what would
+justify the design choice such methods already make.
 
 \textbf{Conservation of cortex-wide dynamics.} Cortex-wide activity contains shared,
-low-dimensional, movement-related components \citep{musall2019,macdowell2020,macdowell2024}. Their
-presence makes cross-subject pooling possible, although it does not alone imply that pooling will
-resist drift.
+low-dimensional, movement-related components \citep{musall2019,macdowell2020,macdowell2024}, and
+latent dynamics are preserved across animals performing similar behaviour to the point that a decoder
+fit to one animal transfers to another \citep{safaie2023}. That conservation is the mechanism a
+pooled decoder would exploit, and it is why pooling is possible at all here. It does not, however,
+imply that pooling will \emph{resist drift}: a code can be shared across individuals and still move
+within each of them at the same rate. Whether the shared component is also the more temporally stable
+one is the empirical question we ask.
 
 \section{Data and methods}
 \textbf{Dataset.} BraiDyn-BC \citep{kondo2025} (DANDI:001425, CC-BY) provides, for each mouse and
@@ -381,8 +396,15 @@ Biology}, 34, 2024.
 \bibitem[Melbaum et al.(2022)]{melbaum2022} S.~Melbaum et al. Conserved structures of neural
 activity in sensorimotor cortex of freely moving rats enable cross-subject decoding. \emph{Nature
 Communications}, 13:7902, 2022.
+\bibitem[Zou et al.(2025)]{metaalign2025} Y.~Zou, K.~Liu, C.~Zhang, Y.~Ling, F.~Wang, M.~Li,
+Y.~Chen, M.~Li, S.~Guan, Z.~He, and C.~T.~Li. Meta-AlignNN: a meta-learning framework for stable
+brain--computer interface performance across subjects, time, and tasks. \emph{bioRxiv}, 2025.
+doi:10.1101/2025.04.20.649482.
 \bibitem[Musall et al.(2019)]{musall2019} S.~Musall et al. Single-trial neural dynamics are
 dominated by richly varied movements. \emph{Nature Neuroscience}, 22(10):1677--1686, 2019.
+\bibitem[Zhang et al.(2025)]{neds2025} Y.~Zhang, Y.~Wang, M.~Azabou, A.~Andre, Z.~Wang, H.~Lyu,
+The International Brain Laboratory, E.~Dyer, L.~Paninski, and C.~Hurwitz. Neural encoding and
+decoding at scale. arXiv:2504.08201, 2025.
 \bibitem[Peterson et al.(2021)]{peterson2021} S.~M.~Peterson, Z.~Steine-Hanson, N.~Davis,
 R.~P.~N.~Rao, and B.~W.~Brunton. Generalized neural decoders for transfer learning across
 participants and recording modalities. \emph{Journal of Neural Engineering}, 18:026014, 2021.
@@ -394,6 +416,9 @@ of cursor-based intracortical brain--computer interfaces using a hidden Markov m
 Biomedical Engineering}, 2025.
 \bibitem[Rule et al.(2019)]{rule2019} M.~E.~Rule, T.~O'Leary, and C.~D.~Harvey. Causes and
 consequences of representational drift. \emph{Current Opinion in Neurobiology}, 58:141--147, 2019.
+\bibitem[Safaie et al.(2023)]{safaie2023} M.~Safaie, J.~C.~Chang, J.~Park, L.~E.~Miller,
+J.~T.~Dudman, M.~G.~Perich, and J.~A.~Gallego. Preserved neural dynamics across animals performing
+similar behaviour. \emph{Nature}, 623:765--771, 2023.
 \bibitem[Rule et al.(2020)]{rule2020} M.~E.~Rule et al. Stable task information from an unstable
 neural population. \emph{eLife}, 9:e51121, 2020.
 \bibitem[Schneider et al.(2023)]{schneider2023} S.~Schneider, J.~H.~Lee, and M.~W.~Mathis.
