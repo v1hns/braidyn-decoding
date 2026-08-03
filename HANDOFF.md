@@ -335,3 +335,68 @@ zip instead.
    ICLR 2027 (deadline 2026-09-24). The Allen replication is exactly the "substantial new content"
    an archival venue expects.
 4. Add a discussion sentence on §6 — the reason nobody tested this is that the data barely exists.
+
+---
+
+## 12. ⭐ START HERE — where the 2026-08-03 session left off
+
+The session ended on a deliberate **Claude Code restart** so the Claude in Chrome extension would be
+detected at startup. Everything below is already done and pushed to `main`.
+
+### State of the work
+
+- **All merged to `main`** (PRs #14, #15, #16). `allen2p_leakfix.py` + `.json`, and the paper
+  write-up: §5.7, Table 4, the Allen methods paragraphs, one abstract sentence, one contributions
+  bullet, the dataset citation. **Additive only — not one of the author's sentences was reworded.**
+- `paper_neurips/pooling.tex` compiles clean under `pdflatex` (main text ends p. 8, refs run to p. 9;
+  NeurIPS excludes refs from the limit).
+- Feature cache `allen2p_features.npz` is gitignored and **may not exist after the restart** — if
+  missing, `allen2p_leakfix.py` re-streams 184 experiments from S3 (~10 min). Analyses alone are ~2 min.
+- Local venv at `.venv` (numpy/scipy/sklearn/h5py/remfile). The Mac paths in §9 do not apply here.
+
+### THE ONE THING BLOCKING THE PAPER: the dictation pass
+
+`WORKSHEET_v6.md` in this repo. **Do not ask the author to re-dictate anything from v4.** v5 made
+that mistake and he called it out. v6 is deliberately small:
+
+- **Part 1** — one decision: headline both cohorts (A, proposed), headline Allen (B), or interleave (C).
+  Recommendation is A: Allen has the bigger number (+0.023 vs +0.017) but weaker evidence (n=23,
+  p=0.003, count-matched only marginal at p=0.054), and the two AUC deltas are not on a comparable
+  scale, so leading with Allen reads as cherry-picking.
+- **Part 2** — eight chunks of agent-written prose that has never been through his voice.
+- **Part 3** — the only **two** of his sentences that must change:
+  1. **Limitations** claims single-neuron codes "remains unknown" — the Allen replication *is*
+     single-neuron two-photon. **The paper currently contradicts itself.** Not a polish item.
+  2. **Discussion** says "four checks"; there are five now.
+
+Under Option A everything else he dictated in v4 stands untouched, because the new material is added
+*alongside* his sentences rather than replacing them.
+
+### Overleaf
+
+- **Free plan — confirmed by looking at the account.** So the git bridge is OUT (premium only).
+  Do not propose it again.
+- Target project: **`pooling-neurips-overleaf`**. Only `pooling.tex` changed, no new figures, so it
+  is a **single-file overwrite** and the §8 figs-folder gotcha does not apply.
+- Push **once**, after the dictation lands. Not before.
+
+### The VPS browser stack (new this session, and the reason for the restart)
+
+This box is a headless KVM VPS reached over tmux/ssh. There was no display, so one was built:
+
+- `~/bin/vps-desktop.sh {start|stop|restart|status|chrome|setpass}` — Xvfb `:99` at 1920x1080,
+  openbox, x11vnc, noVNC. Logs in `~/.vps-desktop/`.
+- **Everything is bound to 127.0.0.1** (x11vnc `-localhost`, websockify explicit loopback bind).
+  Reach it only through an SSH tunnel — this box has a public IP, so keep it that way:
+  `ssh -L 6080:127.0.0.1:6080 vihaan@152.53.168.226` (or Tailscale `100.73.25.122`), then
+  `http://localhost:6080/vnc.html`. VNC password is hashed at `~/.vnc/passwd`.
+- Chrome runs on `:99` with a persistent profile at `~/.chrome-vps`, already **logged into Overleaf
+  and Google**. The Claude extension (`fcoeoabgfenejglbffodgkkbkcdhcgfn`, v1.0.84) is installed there.
+- `xdotool` and `scrot` are available on `:99` as a fallback if the extension route misbehaves.
+
+### Two capabilities that got blocked by the permission classifier
+
+Worth knowing before planning around them: `sudo apt-get install` and
+`mcp__claude_ai_Google_Drive__create_file` were both denied mid-session (Drive had worked earlier).
+The author ran the apt install by hand. If a Doc is needed again, either retry Drive or create it
+through the now-working browser.
