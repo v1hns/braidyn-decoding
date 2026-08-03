@@ -1,0 +1,297 @@
+# BraiDyn pooling paper — full session handoff
+
+Written 2026-08-02. Everything a fresh session needs to continue this work. Read top to bottom once.
+
+---
+
+## 0. TL;DR
+
+The paper: **a decoder trained on OTHER individuals ages more slowly over days than a decoder
+trained on the subject itself.** Population pooling as an alternative to per-subject recalibration.
+
+- Repo: `~/braidyn-decoding`, GitHub `v1hns/braidyn-decoding`, all work merged to `main`.
+- Live paper: `paper_neurips/pooling.tex` — 8 pages, compiles clean, in the author's own voice.
+- Headline: **+0.017 AUC, p = 5×10⁻⁵**, 73 of 100 mouse–event pairs, session-held-out.
+- **A second dataset just replicated it** (Allen 2-photon, +0.0229, p = 0.0031) — see §5. This is the
+  most important open thread.
+- A second paper (`paper_methods/leakage.tex`) exists but the author **decided not to publish it**.
+  Do not resurrect it without being asked.
+
+---
+
+## 1. What the paper claims
+
+On BraiDyn-BC (DANDI:001425, 25 mice, 44 Allen-atlas cortical parcels, ~15-day cued lever-pull
+operant protocol), for each mouse we compare how much AUC is lost over two weeks by:
+
+- the mouse's **own** early-week decoder (personal), vs
+- a decoder **pooled over the other 24 mice's** early-week data.
+
+Aging = accuracy lost moving from the held-out mouse's early data to its late block, training fixed.
+Asymmetry = (personal aging) − (pooled aging). Positive ⇒ the personal decoder ages more.
+
+### Final numbers (session-held-out — these are the correct ones)
+
+| Event | Personal | Pooled | Asymmetry (95% CI) | p | own ages more | trial-split (WRONG) |
+|---|---|---|---|---|---|---|
+| Lever-pull | −0.022 | −0.025 | +0.003 [−0.004, 0.011] | 0.37 | 64% | +0.014 |
+| Lick | +0.012 | −0.009 | +0.020 [0.008, 0.032] | 0.0023 | 80% | +0.028 |
+| Reward | +0.017 | −0.012 | +0.029 [0.014, 0.046] | 0.0005 | 80% | +0.032 |
+| Tone | +0.016 | +0.001 | +0.015 [0.001, 0.032] | 0.077 | 68% | +0.022 |
+| **Pooled** | | | **+0.017 [0.010, 0.024]** | **5×10⁻⁵** | **73%** | +0.024 |
+
+Supporting results:
+- **Count-matched control**: at equal training-event count, self ages more than a decoder from one
+  other mouse by **+0.010 AUC** on average (lick +0.007, reward +0.017, tone +0.006; lever REVERSES
+  at −0.002). Kills the data-volume explanation. `many < one` on **all four** events.
+- **Decay regression** (15 days): gap narrows 0.0014 AUC/day, p=5×10⁻⁵, 65% of pairs. Pooled decoder
+  *gains* +0.0015/day while personal is flat (+0.0000/day) — see §3 warning.
+- **Capacity** (now a FOOTNOTE, not a section): effect survives 1-D CNN and GRU for lick and reward.
+  linear/CNN/GRU = lick +0.020/+0.012/+0.010, reward +0.029/+0.015/+0.012.
+
+---
+
+## 2. CRITICAL — bugs already found and fixed. Do not reintroduce.
+
+This codebase had three separate rounds of real errors. Every one was a claim that was *assumed*
+rather than *measured*. If you are about to assert something about this data, measure it first.
+
+### 2a. Data leakage in `pooling_drift.py` (fixed by `pooling_leakfix.py`)
+
+Two bugs, both inflating **only the personal arm** — i.e. one side of an asymmetry.
+
+1. `gather()` vstacked early sessions and **destroyed session identity**; WS was then estimated with
+   `StratifiedKFold(shuffle=True)` over pooled trials, so the personal decoder trained on session 3
+   and was tested on other trials of session 3. The pooled decoder trains on other mice and cannot
+   leak. **Fix: leave-one-early-SESSION-out with matched training sets for WS and WX.**
+   Cost: pooled +0.024 → +0.017; lever-pull +0.014 (p=0.001) → **+0.003 (p=0.37)** — entirely leakage.
+2. `analysis_C` (count-matched control) scored the self arm on its **own training data**:
+   `pc=_fit(Xe,ye); _auc(pc,Xe,ye) - _auc(pc,Xl,yl)` — training accuracy, no CV, while one/many were
+   held out. **Fix: all three arms train on n events, score on the same held-out session.**
+   Moved lever-pull's self arm by −0.024 and reversed the control's ordering.
+
+`analysis_B` (scaling vs N) was always clean — never sees the held-out mouse.
+
+**Validation that makes the corrected numbers trustworthy:** `pooling_leakfix.py` replays the OLD
+protocol on the SAME features and reproduces the published numbers exactly (+0.0240 pooled vs
+published +0.024; per-event +0.0138/+0.0276/+0.0322/+0.0224 vs +0.014/+0.028/+0.033/+0.022). So the
+difference is a measurement of the bug, not of a reimplementation.
+
+### 2b. The four "events" are NOT four independent events (`event_overlap_check.py`)
+
+Measured on 8 sessions × 8 mice, onset timings only:
+
+- Every **reward** onset has a **lever-pull** onset a median **0.083 s** away and a **lick** onset
+  **0.117 s** away — **100%** and **98%** land inside the [−0.5,+1.0] s feature window.
+- Positive windows containing ≥1 other event: reward **100%**, lick 84%, tone 84%, lever 68%.
+- **Negatives are contaminated 33–57%** (reward 56%, tone 57%): `build_session` screens negatives
+  only against the SAME target's onsets. The Methods sentence claiming ">2 s from any event" was
+  **wrong** and is now fixed to say what the code does.
+- Event counts differ >10×: reward 56/session, tone 107, lick 530, lever 652 — and the per-event
+  asymmetry runs roughly OPPOSITE to that count (Spearman ≈ −0.8, n=4).
+
+**Consequence, and DO NOT UNDO THIS:** a planned restructure to "lead with reward and lick" was
+**reverted**, because those two co-occur within 120 ms and were never two independent confirmations.
+The paper now defends the **pooled estimate** and reports the per-event column as **data, not four
+findings**. §4.2 "What the four events are" states all of the above. Do not re-propose a per-event
+framing.
+
+### 2c. Two pilot-selection bugs (mine, fixed 2026-08-02)
+
+First Allen 2P pilot run selected **1 mouse** and looked like a null. Causes: depth binned `[125,175)`
+in the pilot vs `[150,200)` in the analysis that found the mice, plus requiring every experiment in a
+container to match. Also mis-flagged low neuron counts as a `find_dff` bug — they were real (that
+plane has 12 cells; cohort median is 57). Fixed; see §5.
+
+---
+
+## 3. Framing decisions the author made (respect these)
+
+The author did a full dictation pass on a read-and-restate worksheet; the paper is in **his voice**,
+built from his sentences as blocks. Memory rule `feedback_formatting_only_on_hand_rewrites` applies:
+**when he hand-writes prose, change only formatting/presentation, never wording.**
+
+Decisions from that pass:
+- **"targets" → "events"** everywhere. Zero instances of "target" should remain.
+- Leakage caveat **removed from the abstract**, lives in limitations ("I don't even get what the
+  second part is saying... put this in the limitations").
+- Capacity section + Table 3 **collapsed to a footnote** ("maybe I'll have a short footnote of it").
+- Related-work order **swapped** (prior-work-at-fixed-time first, count-matched second).
+- Abstract cut 293 → 212 words; the lick/reward result is stated **once**, not three times.
+- Discussion has a paragraph on **why the effect is believable** (four independent checks, and the
+  reported effect is what SURVIVED the leakage correction).
+
+**WARNING — the "rising tide" framing is BraiDyn-specific.** In BraiDyn the pooled decoder *gains*
+(+0.0015/day) while the personal one is flat, so the gap narrows because pooling improves. In the
+Allen 2P replication pooled aging is **+0.001 (flat)** and the asymmetry comes entirely from the
+personal decoder aging. Do not export the rising-tide language to the new dataset.
+
+---
+
+## 4. Files in the repo
+
+### Analysis (BraiDyn)
+| file | what it does |
+|---|---|
+| `pooling_drift.py` | ORIGINAL, **has the leakage bugs**. Kept for provenance. Do not cite its JSON. |
+| `pooling_leakfix.py` | **Corrected** A/B/C, runs leaky+fixed side by side → `pooling_leakfix.json` |
+| `nonlinear_leakfix.py` | Corrected CNN/GRU capacity → `nonlinear_leakfix.json` |
+| `full_decay.py` | 15-day decay regression (ALWAYS was correct, LOSO) → `full_decay.json` |
+| `event_overlap_check.py` | Event timing/overlap audit → `event_overlap.json` |
+| `make_pooling_figs.py` | fig_mechanism from `pooling_leakfix.json` |
+| `make_decay_fig.py` | fig_decay from `full_decay.json` |
+| `allen2p_pilot.py` | **NEW** Allen 2-photon replication pilot → `allen2p_pilot.json` |
+| `leakage_sim.py`, `cardin_leakage.py` | for the shelved methods note |
+
+### Papers
+- `paper_neurips/pooling.tex` — **THE paper**. 8pp. Compile: `/opt/homebrew/bin/tectonic paper_neurips/pooling.tex`
+- `paper_methods/leakage.tex` — methods note, **author declined to publish**. Leave parked.
+- `paper_iclr/`, `paper/` — superseded, ignore.
+
+---
+
+## 5. ⭐ THE OPEN THREAD — Allen 2-photon replication (result just landed)
+
+`allen2p_pilot.py`, run 2026-08-02. **The effect replicated on an independent dataset.**
+
+Cohort selection (this is the load-bearing part): Allen Visual Behavior 2-photon, containers spanning
+**≥14 days**, all experiments **VISp** in a single 50 µm depth bin. Largest band is **150–199 µm →
+25 mice**, 184 experiments, median 57 cells/experiment. 23 mice usable (≥4 sessions).
+
+**Why permutation-invariant features:** there is NO cross-animal neuron correspondence (mouse A's
+neuron #17 ≠ mouse B's #17), and the longitudinal subset is single-plane, so area-averaging gives a
+1-D feature. The only comparable representation is a permutation-invariant summary of the population
+response: 25 quantiles + mean + sd of the per-neuron evoked response = **27 dims**, fixed across mice.
+
+Target is `is_change` (real image change vs sham catch trial) — a **stimulus** contrast, materially
+less reward/lick-coupled than anything in BraiDyn.
+
+### Result
+
+| | BraiDyn | Allen 2P |
+|---|---|---|
+| personal aging | +0.012…+0.017 | **+0.0240** |
+| pooled aging | −0.009…−0.012 | **+0.0010** |
+| **asymmetry** | **+0.017** (p=5e-5) | **+0.0229** (p=0.0031) |
+| holds in | 73% of pairs | **74% of mice (23)** |
+| decodability | — | within 0.672 / pooled 0.638 |
+
+Different lab, modality, task, and feature space. Same sign, comparable magnitude.
+
+### WHAT MUST HAPPEN BEFORE THIS GOES IN THE PAPER
+
+The pilot uses leave-one-session-out for WS (correct) but has **NOT** been run through the rest of
+the corrected protocol. Given §2a, this is non-negotiable:
+
+1. **Count-matched control** on the Allen cohort (self / one-other / many-others at matched n).
+2. **Trial-split vs session-held-out comparison**, to quantify the inflation on this dataset too.
+3. Consider whether 23 mice with ≥4 sessions is the right inclusion rule (2 dropped).
+
+Only then write it up as a Results subsection. The author asked "run the leakage-corrected protocol
+on this cohort?" was the pending question when the session ended.
+
+---
+
+## 6. Dataset landscape (searched exhaustively — don't redo this)
+
+**Public neural datasets have many subjects OR many sessions per subject, essentially never both,
+and almost never with a shared coordinate system too.** BraiDyn has all three, which is why this
+study was constructible. Worth a sentence in the discussion.
+
+| dataset | subjects | sessions/subject | verdict |
+|---|---|---|---|
+| FALCON (DANDI 000954 etc.) | **6** | 287 days ✓ | can't do LOSO; FALCON says so itself |
+| LINK (DANDI 001201) | **1 monkey** | 312 ✓ | single subject |
+| IBL Widefield (DANDI 001712) | **1** | 5 files | partial upload |
+| BRAVO1 (DANDI 001535) | **1** human | — | single subject |
+| DANDI 000244 | 25 ✓ | **~1** | no longitudinal |
+| IBL Brain-Wide Map | 139 ✓ | acute | no longitudinal |
+| Allen VB **Neuropixels** | 81 ✓ | **2 consecutive days** | hard fail |
+| **Allen VB 2-photon** | 107 ✓ | median 11 d (25 mice ≥14 d) | ✅ **USED — see §5** |
+| **BraiDyn-BC** | 25 ✓ | ~15 over 3 wk ✓ | the main dataset |
+
+Allen 2P full download would be ~480 GB (248 MB/experiment × 1936). **Stream with `remfile`+`h5py`
+instead** — that's what `allen2p_pilot.py` does; never download whole files.
+
+Allen 2P NWB layout (verified by probe):
+- dF/F: `processing/ophys/dff/traces/data`, shape **(time, neurons)**, timestamps alongside
+- trials: `intervals/trials` with `change_time`, `is_change`, `go`, `catch`, `hit`, `lick_times`
+- metadata CSVs: `https://visual-behavior-ophys-data.s3.us-west-2.amazonaws.com/visual-behavior-ophys/project_metadata/{ophys_experiment_table,ophys_cells_table}.csv`
+
+---
+
+## 7. Prior art / scooping (all now cited)
+
+- **Safaie et al. 2023**, Nature 623:765–771, *Preserved neural dynamics across animals* — the
+  mechanistic precursor. Paper states: conservation makes pooling **possible** but does not imply it
+  **resists drift**. That gap is our question.
+- **NEDS**, Zhang et al., arXiv:2504.08201 — pooled pretraining on 83 IBL animals + fine-tuning on
+  held-out animals, IBL consortium authors. **No time-resolved analysis** → doesn't touch our claim.
+- **Meta-AlignNN**, Zou et al., bioRxiv 2025, doi:10.1101/2025.04.20.649482 — **closest work**. Uses
+  cross-subject consistency for BCI stability across subjects/time/tasks, 2 years, 3 monkeys. Gets
+  its own paragraph. Distinction: **they propose a method, we measure whether the effect exists.**
+- **WiCAT** (Hosseini et al., ICML 2026, arXiv:2607.09754) — cross-subject decoding on the SAME
+  BraiDyn cohort. Already cited. Never claim we beat them (AUC vs R², not comparable).
+
+A forward-citation sweep (114 citations of Safaie, 85 of NDT2, via Semantic Scholar graph) found
+**nobody has published the differential-aging claim**. That is the novelty.
+
+---
+
+## 8. External resources
+
+- GitHub: `v1hns/braidyn-decoding` — PRs #9, #10, #11, #12 all merged to `main`.
+- Overleaf (pooling paper): https://www.overleaf.com/project/6a5acae5bbb72f3b80b9173a — synced.
+- Overleaf (methods note, parked): https://www.overleaf.com/project/6a6c57c6faa0705a6da29f14
+- Worksheet Doc (drift paper, **dictation already applied**):
+  `14gP87UxTIES-4PnpVBuPAgBFUvr0HQosfvXKHWQ5rfI`
+- Worksheet Doc (methods note, never used): `1CeFASJCpWGj1RkiGJ7X3uasrP5Mga_rECsbT40aonhU`
+- User memory: `~/.claude/projects/-Users-vihaanshringi/memory/project_braidyn_hit.md`
+
+**Overleaf upload gotcha:** uploading figures with the `figs` folder merely *selected* still dumps
+them at ROOT as duplicates while `figs/` keeps stale copies. Reliable path: **right-click a file
+inside `figs/` → Upload → Overwrite**, then delete any root duplicates. For a NEW project, upload a
+zip instead.
+
+---
+
+## 9. Environment / ops
+
+- Compile: `/opt/homebrew/bin/tectonic` (full path; not on non-interactive PATH). No pdflatex.
+- Python: `~/braidyn-decoding/.venv` has numpy, scipy, sklearn, dandi, remfile, h5py, pynwb.
+- Lambda: creds `~/.lambda_key`, key `~/.ssh/lambda_tvdx` (registered as `tvdx-key`). **Terminate
+  when done** — all boxes from this session ARE terminated.
+- **Lambda ssh gotcha (hit twice, two regions):** boxes go unreachable on port 22 after ~4 sequential
+  ssh/scp operations (banner-exchange timeout) while the API still says `active`. Looks like
+  connection rate-limiting. Provision with ONE combined ssh + retries, not a chain.
+- The leakage sim + Cardin tests were run **locally** — a justified exception to the always-cloud
+  rule, which exists for GPU/MPS RAM reasons that don't apply to CPU sklearn on tiny data.
+- Web search budget was exhausted in this session; Semantic Scholar / Crossref / DANDI APIs via
+  `curl` are good substitutes and don't consume it.
+
+---
+
+## 10. User preferences (from memory)
+
+- **Always push to branches, never directly to main**; PR then `gh pr merge --merge` (**never
+  `--squash`** — preserve per-commit history).
+- Commit + push after every prompt that edits code.
+- Heavy compute on cloud, not the laptop.
+- Save local deliverables to `~/Downloads`, not Desktop.
+- When he hand-writes prose, change **only** formatting — never his wording.
+- He values being told when something doesn't hold up. Three claims died on contact with a test this
+  session and he wanted each of them killed rather than defended.
+
+---
+
+## 11. Immediate next steps
+
+1. **Run the leakage-corrected protocol on the Allen 2P cohort** (count-matched + trial-split
+   comparison). This was the pending question. See §5.
+2. If it holds, write it up as a Results subsection + update abstract/contributions. It converts the
+   paper from single-dataset to a two-dataset replication across lab/modality/task.
+3. Decide venue. Workshop (non-archival, so an archival submission later is normally fine — but
+   **verify per-workshop CFP + host conference dual-submission clause**, this was NOT verified) vs
+   ICLR 2027 (deadline 2026-09-24). The Allen replication is exactly the "substantial new content"
+   an archival venue expects.
+4. Add a discussion sentence on §6 — the reason nobody tested this is that the data barely exists.
