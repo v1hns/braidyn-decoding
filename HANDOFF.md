@@ -12,8 +12,8 @@ trained on the subject itself.** Population pooling as an alternative to per-sub
 - Repo: `~/braidyn-decoding`, GitHub `v1hns/braidyn-decoding`, all work merged to `main`.
 - Live paper: `paper_neurips/pooling.tex` — 8 pages, compiles clean, in the author's own voice.
 - Headline: **+0.017 AUC, p = 5×10⁻⁵**, 73 of 100 mouse–event pairs, session-held-out.
-- **A second dataset just replicated it** (Allen 2-photon, +0.0229, p = 0.0031) — see §5. This is the
-  most important open thread.
+- **A second dataset replicated it** (Allen 2-photon, +0.0229, p = 0.0034) and has now been through
+  the full leakage-corrected protocol — see §5. Written into the paper; awaiting a dictation pass.
 - A second paper (`paper_methods/leakage.tex`) exists but the author **decided not to publish it**.
   Do not resurrect it without being asked.
 
@@ -140,7 +140,8 @@ personal decoder aging. Do not export the rising-tide language to the new datase
 | `event_overlap_check.py` | Event timing/overlap audit → `event_overlap.json` |
 | `make_pooling_figs.py` | fig_mechanism from `pooling_leakfix.json` |
 | `make_decay_fig.py` | fig_decay from `full_decay.json` |
-| `allen2p_pilot.py` | **NEW** Allen 2-photon replication pilot → `allen2p_pilot.json` |
+| `allen2p_pilot.py` | Allen 2-photon replication pilot → `allen2p_pilot.json` |
+| `allen2p_leakfix.py` | **NEW** corrected protocol on Allen (A/C/D + leak-vs-aggregation E) → `allen2p_leakfix.json` |
 | `leakage_sim.py`, `cardin_leakage.py` | for the shelved methods note |
 
 ### Papers
@@ -178,17 +179,35 @@ less reward/lick-coupled than anything in BraiDyn.
 
 Different lab, modality, task, and feature space. Same sign, comparable magnitude.
 
-### WHAT MUST HAPPEN BEFORE THIS GOES IN THE PAPER
+### ✅ DONE 2026-08-03 — the corrected protocol was run (`allen2p_leakfix.py` → `allen2p_leakfix.json`)
 
-The pilot uses leave-one-session-out for WS (correct) but has **NOT** been run through the rest of
-the corrected protocol. Given §2a, this is non-negotiable:
+Features cached to `allen2p_features.npz` (gitignored); re-runs take ~2 min instead of ~20. The
+script imports `allen2p_pilot.py` for cohort/build/features, so it is not a reimplementation. All
+three gates passed.
 
-1. **Count-matched control** on the Allen cohort (self / one-other / many-others at matched n).
-2. **Trial-split vs session-held-out comparison**, to quantify the inflation on this dataset too.
-3. Consider whether 23 mice with ≥4 sessions is the right inclusion rule (2 dropped).
+1. **Count-matched control.** self **+0.0240**, one other mouse **+0.0132**, many others **+0.0030**.
+   self−one **+0.0108** [0.0010, 0.0217] p=0.054 (marginal — say so, don't hide it); self−many
+   **+0.0210** p=0.0019; many−one **−0.0102** p=0.0031, the same diversity ordering as BraiDyn.
+   The leaky variant inflates self to +0.0631, so bug C would have bitten here too.
+2. **Trial-split vs session-held-out — DOES NOT BEHAVE LIKE BRAIDYN.** The trial split *deflates*
+   the asymmetry here (+0.0137, p=0.065) instead of inflating it. Decomposed in `analysis_E` rather
+   than asserted: leakage still inflates the personal arm **+0.0153** at matched aging, but scoring
+   one pooled AUC across sessions instead of averaging per-session AUCs costs **−0.0301** (p<1e-4)
+   and dominates. The corrected estimate is the *larger* one here, so the replication is not a leak.
+   Do not export "the trial split inflates the asymmetry" as a general claim — it is BraiDyn-specific
+   as a *net* statement. The transferable claim is narrower: only the personal arm can share a
+   session with its test data.
+3. **Inclusion rule doesn't matter.** ≥3 → 24 mice +0.0223; ≥4 → 23 mice +0.0229; ≥5 → 22 +0.0228;
+   ≥6 → 18 +0.0239. And §5's old framing was wrong: every container has ≥5 sessions, so the 2 mice
+   the pilot lost were per-experiment QC failures (17 of 18 dropped experiments had <15 cells),
+   not short containers.
 
-Only then write it up as a Results subsection. The author asked "run the leakage-corrected protocol
-on this cohort?" was the pending question when the session ended.
+`analysis_A` fixed reproduces the pilot to the digit (+0.0229, p=0.0034, 74%, WS 0.6721) from a
+separate code path. Effect size d=0.68, sd 0.034 > mean 0.023 — a real but noisy 23-mouse result.
+
+**Also fixed:** `pooling_leakfix.py` seeds resampling with `hash(m)`, which Python salts per process,
+so its count-matched numbers are not reproducible across runs. `allen2p_leakfix.py` uses `crc32`.
+Worth backporting.
 
 ---
 
@@ -240,12 +259,17 @@ A forward-citation sweep (114 citations of Safaie, 85 of NDT2, via Semantic Scho
 
 ## 8. External resources
 
-- GitHub: `v1hns/braidyn-decoding` — PRs #9, #10, #11, #12 all merged to `main`.
+- GitHub: `v1hns/braidyn-decoding` — PRs #9–#13 merged to `main`. **#14 (Allen corrected protocol)
+  and #15 (paper write-up, stacked on #14) are OPEN** — agent merge was blocked by the permission
+  classifier, so they need `gh pr merge 14 --merge` then `gh pr merge 15 --merge`.
 - Overleaf (pooling paper): https://www.overleaf.com/project/6a5acae5bbb72f3b80b9173a — synced.
 - Overleaf (methods note, parked): https://www.overleaf.com/project/6a6c57c6faa0705a6da29f14
 - Worksheet Doc (drift paper, **dictation already applied**):
   `14gP87UxTIES-4PnpVBuPAgBFUvr0HQosfvXKHWQ5rfI`
 - Worksheet Doc (methods note, never used): `1CeFASJCpWGj1RkiGJ7X3uasrP5Mga_rECsbT40aonhU`
+- Worksheet Doc **v5** (two-dataset reframe, **awaiting dictation**):
+  `1mQTRXRLzQ2pjNGEr572SxcWxNlBLTEfUJqfURf1I46I`
+  (a stray empty doc `15VVmnn1p6KQiMoRrcNm1e5V5EjKuNuAuECV2g9BrH9E` was created by mistake — delete it)
 - User memory: `~/.claude/projects/-Users-vihaanshringi/memory/project_braidyn_hit.md`
 
 **Overleaf upload gotcha:** uploading figures with the `figs` folder merely *selected* still dumps
@@ -257,7 +281,9 @@ zip instead.
 
 ## 9. Environment / ops
 
-- Compile: `/opt/homebrew/bin/tectonic` (full path; not on non-interactive PATH). No pdflatex.
+- Compile: `/opt/homebrew/bin/tectonic` (full path; not on non-interactive PATH) on the Mac. The
+  2026-08-03 session ran on Linux and used `pdflatex`, which works fine (9 pp: main text ends p. 8,
+  refs run to p. 9; NeurIPS excludes refs from the limit).
 - Python: `~/braidyn-decoding/.venv` has numpy, scipy, sklearn, dandi, remfile, h5py, pynwb.
 - Lambda: creds `~/.lambda_key`, key `~/.ssh/lambda_tvdx` (registered as `tvdx-key`). **Terminate
   when done** — all boxes from this session ARE terminated.
@@ -286,11 +312,25 @@ zip instead.
 
 ## 11. Immediate next steps
 
-1. **Run the leakage-corrected protocol on the Allen 2P cohort** (count-matched + trial-split
-   comparison). This was the pending question. See §5.
-2. If it holds, write it up as a Results subsection + update abstract/contributions. It converts the
-   paper from single-dataset to a two-dataset replication across lab/modality/task.
-3. Decide venue. Workshop (non-archival, so an archival submission later is normally fine — but
+1. ~~Run the leakage-corrected protocol on the Allen 2P cohort.~~ **Done, §5. It held.**
+2. ~~Write it up as a Results subsection + update abstract/contributions.~~ **Done** — §5.7 + Table 4
+   + methods paragraphs + abstract sentence + contributions bullet, PR #15 (stacked on #14). The
+   write-up is **additive only**: not one existing sentence was reworded.
+3. **PENDING — the dictation pass.** The author asked to reframe the headline around both datasets
+   ("optimize for results"). That touches title/abstract/contributions/intro, all his prose, so
+   **worksheet v5** was built instead of rewriting it:
+   `1mQTRXRLzQ2pjNGEr572SxcWxNlBLTEfUJqfURf1I46I`. 16 chunks. Chunk 1 is the ordering decision
+   (recommendation: headline both, BraiDyn primary, Allen as replication — Allen has the bigger
+   number but weaker evidence, and the two AUC deltas are not on a comparable scale).
+   **Two chunks are not stylistic and must be resolved before submission:**
+   - **Ch. 15 — the paper now contradicts itself.** Limitations says single-neuron codes "remains
+     unknown"; the Allen replication *is* single-neuron two-photon.
+   - **Ch. 14 —** Discussion says "four checks"; there are now five.
+4. **Overleaf sync is manual and was NOT done** — no Overleaf credentials or tool available to the
+   agent, and past sessions did it by hand. Only `pooling.tex` changed (no new figures), so it is a
+   single-file overwrite and the §8 figs-folder gotcha does not apply. Bundle also at
+   `~/Downloads/pooling_overleaf_2026-08-03.zip`.
+5. Decide venue. Workshop (non-archival, so an archival submission later is normally fine — but
    **verify per-workshop CFP + host conference dual-submission clause**, this was NOT verified) vs
    ICLR 2027 (deadline 2026-09-24). The Allen replication is exactly the "substantial new content"
    an archival venue expects.

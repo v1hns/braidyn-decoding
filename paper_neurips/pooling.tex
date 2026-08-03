@@ -47,6 +47,10 @@ differ highly in sample size, so we report the variation in general without attr
 individual behaviors. This also is not a data-volume effect: at a matched training-event count a
 decoder from a single other mouse still ages less. Hence we conclude this is rather an effect of not
 overfitting an individual's drift-prone idiosyncrasies. It also survives a 1-D CNN and a GRU. The
+effect is not confined to that cohort or that recording modality: on an independent two-photon
+dataset from a different laboratory (Allen Visual Behavior, 23 mice, single-plane VISp populations
+decoding a stimulus change) the same session-held-out protocol gives $+0.023$ $\auc$
+($p = 0.003$, 74\% of mice), and the count-matched control reproduces there as well. The
 early-week accuracy cost of decoding across individuals is repaid as late-week stability, which
 suggests population priors as an alternative to per-subject recalibration. Code and a
 streamed-feature pipeline are released.
@@ -83,6 +87,11 @@ on one other mouse ages less than one trained on the subject's own, by $+0.010$ 
 The gain therefore comes from training on individuals other than the subject, not from the larger
 training set pooling usually brings, and training on many other mice rather than one lowers aging
 further on all four events (Sections~\ref{sec:matched}--\ref{sec:scaling}).
+\item \textbf{It replicates on an independent dataset.} The same protocol applied to the Allen
+Visual Behavior two-photon cohort -- a different laboratory, recording modality, task and feature
+space, at cellular rather than mesoscale resolution -- gives an asymmetry of $+0.023$ $\auc$
+($p = 0.003$, 74\% of 23 mice), with the count-matched ordering also reproduced
+(Section~\ref{sec:allen}).
 \item \textbf{Session-level validation is load-bearing.} As trials within a recording session are
 dependent, a trial-level split inflates the personal decoder but not the pooled one, one-sidedly
 inflating the asymmetry. We report that inflation for each event; on lever pull it accounts for the
@@ -182,6 +191,26 @@ $\mathrm{LS}-\mathrm{LX}$. The per-mouse aging asymmetry is
 $(\mathrm{WS}-\mathrm{WX})-(\mathrm{LS}-\mathrm{LX})$; a positive value means the personal decoder
 ages more. We assess significance with a paired sign-flip permutation test across mice
 (20{,}000 permutations) and compute 95\% confidence intervals with a cluster bootstrap over mice.
+
+\textbf{External validation dataset.} Section~\ref{sec:allen} repeats the analysis on the Allen
+Visual Behavior two-photon dataset \citep{allenvb2023}. We select containers spanning at least 14
+days whose experiments are all in VISp within a single 50\,\textmu m depth bin, which is the
+cross-subject correspondence available here; the largest such band, 150--199\,\textmu m, holds 25
+mice and 184 experiments. We require at least 15 segmented cells and 40 usable trials per
+experiment, leaving 166 experiments and 23 mice with at least four sessions. Sessions are streamed
+from S3 rather than downloaded.
+
+This dataset has no neuron correspondence across animals -- mouse A's cell 17 is unrelated to mouse
+B's cell 17 -- and the longitudinal subset is single-plane, so averaging over the field of view
+would give a one-dimensional feature. The representation that is comparable across animals is
+therefore a permutation-invariant summary of the population response: per neuron we take the mean
+$\Delta F/F$ over $0$--$1$\,s minus the mean over $-0.5$--$0$\,s, then describe the distribution of
+those evoked responses by 25 quantiles plus its mean and standard deviation, giving a fixed
+27-dimensional feature regardless of how many cells were segmented. The decoded contrast is
+\texttt{is\_change}, a real image change against a sham catch trial, which is a stimulus contrast
+rather than a reward- or lick-coupled one. Each mouse's sessions are split by date into early and
+late halves, and the personal decoder, the pooled decoder, aging, the asymmetry and the
+count-matched control are all defined exactly as above.
 
 \section{Results}
 
@@ -328,6 +357,75 @@ decoder against a cross-subject one is exposed to it, since only the within-subj
 session between train and test. Where trials are not independent -- which for physiological
 recordings is the normal case -- the split must respect the recording session.
 
+\subsection{The effect replicates on an independent dataset}
+\label{sec:allen}
+Everything above rests on one cohort, one imaging modality and one task. To test whether the
+asymmetry is a property of that setting we repeat the analysis on the Allen Visual Behavior
+two-photon dataset \citep{allenvb2023}: a different laboratory, cellular two-photon rather than
+mesoscale widefield imaging, a visual change-detection task rather than a cued lever pull, and a
+27-dimensional permutation-invariant population summary rather than a 44-parcel atlas feature. The
+decoded contrast is a stimulus change, so it is much less coupled to reward and licking than
+anything decoded on BraiDyn-BC. Little is shared between the two analyses except the question and
+the protocol.
+
+The asymmetry reproduces at comparable magnitude (Table~\ref{tab:allen}). Across 23 mice the
+personal decoder ages by $+0.024$ $\auc$ and the pooled decoder by $+0.001$, an asymmetry of
+$+0.023$ $[0.010, 0.037]$, $p = 0.003$, with the mouse's own decoder ageing more in 74\% of animals.
+Early-block accuracy is $0.672$ for the personal decoder and $0.638$ for the pooled one, so the
+familiar ordering holds at the start; by the late block the personal decoder leads by only $0.012$,
+about a third of its initial advantage.
+
+The mechanism is not identical, and the difference is worth stating. On BraiDyn-BC the gap narrows
+mostly because the pooled decoder \emph{gains} over days as the animal becomes more practised
+(Section~\ref{sec:decay}), while the personal decoder stays flat. Here the pooled decoder is flat
+($+0.001$) and the entire asymmetry comes from the personal decoder losing accuracy. The shared
+finding is that the personal decoder ages faster, not the route by which the two arms separate.
+
+The count-matched control reproduces as well. At equal training-event count the self decoder ages
+by $+0.024$, a decoder from one other mouse by $+0.013$ and one drawn across the other mice by
+$+0.003$. The self-minus-one gap is $+0.011$ $[0.001, 0.022]$, close to the $+0.010$ measured on
+BraiDyn-BC, though on 23 animals it is marginal by the sign-flip test ($p = 0.054$); the
+self-minus-many gap is $+0.021$ $[0.010, 0.033]$, $p = 0.002$. The diversity ordering is again the
+most robust part: many other mice age less than one other mouse by $-0.010$
+$[-0.016, -0.004]$, $p = 0.003$, matching the direction that held for all four BraiDyn-BC events.
+The result also does not depend on where the inclusion threshold is drawn, giving $+0.022$ at three
+or more sessions per mouse (24 mice), $+0.023$ at four (23 mice), $+0.023$ at five (22 mice) and
+$+0.024$ at six (18 mice).
+
+One thing does not transfer, and it sharpens rather than weakens the recommendation of
+Section~\ref{sec:protocol}. Repeating the trial-level split here \emph{lowers} the asymmetry, to
+$+0.014$ ($p = 0.07$), rather than raising it as it does on BraiDyn-BC. Two things differ between
+the protocols and only one of them is leakage, so we separate them on the same trials. Holding the
+scoring fixed, trial shuffling still inflates the personal decoder's within-block accuracy, by
+$+0.015$, in the same direction and of the same size as on BraiDyn-BC. But the trial-split protocol
+also scores a single pooled $\auc$ across sessions rather than averaging per-session values, and on
+this dataset that costs $-0.030$ ($p < 10^{-4}$), because between-session shifts in the decision
+variable depress a pooled $\auc$ in a way a within-session one never sees. The larger of the two
+effects is the scoring convention, which is why the naive comparison points the wrong way. The
+leakage itself behaves exactly as before, and the corrected estimate is here the \emph{larger} one,
+so the replication is not an artifact of the split.
+
+\begin{table}[t]\centering
+\caption{The aging asymmetry on the original cohort and on the external validation dataset. Aging
+is $\auc$ lost from early to late test with training held fixed; asymmetry is personal $-$ pooled
+aging, positive when the subject's own decoder ages more. Both rows use the same session-held-out
+protocol and the same count-matched control. $p$: paired sign-flip permutation.}
+\label{tab:allen}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lccccc}
+\toprule
+& Personal & Pooled & Asymmetry (95\% CI) & $p$ & own ages more \\
+\midrule
+BraiDyn-BC, widefield, 25 mice & & & $+0.017$ $[0.010, 0.024]$ & $5\times10^{-5}$ & 73\% \\
+Allen VB, two-photon, 23 mice & $+0.024$ & $+0.001$ & $+0.023$ $[0.010, 0.037]$ & 0.003 & 74\% \\
+\midrule
+\multicolumn{6}{l}{\emph{Count-matched control: aging at equal training-event count}} \\
+BraiDyn-BC & \multicolumn{5}{l}{self $-$ one other mouse $= +0.010$; many others age less than one on all four events} \\
+Allen VB & \multicolumn{5}{l}{self $+0.024$, one $+0.013$, many $+0.003$; self $-$ one $= +0.011$, many $-$ one $= -0.010$} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Discussion}
 A subject's own decoder overfits idiosyncratic features of its early sessions, some of which later
 drift. A decoder that has never seen the subject must instead rely on components of the code that are
@@ -369,11 +467,16 @@ sessions held out.
 BraiDyn-BC is publicly available through DANDI:001425. We release the analysis code and a streaming
 feature pipeline that reproduces all reported results from the parcellated traces without downloading
 the raw imaging data. Section 3 and the released code specify all data splits, permutation seeds, and
-hyperparameters.
+hyperparameters. The external validation dataset of Section~\ref{sec:allen} is likewise public, and
+the released code streams it from its public bucket and reproduces that section from the same cohort
+selection rule.
 
 {\small
 \bibliographystyle{plainnat}
 \begin{thebibliography}{99}
+\bibitem[Allen Institute for Brain Science(2023)]{allenvb2023} Allen Institute for Brain Science.
+Visual Behavior --- 2-photon. \emph{Allen Brain Observatory}, 2023.
+\url{https://portal.brain-map.org/circuits-behavior/visual-behavior-2p}.
 \bibitem[Degenhart et al.(2020)]{degenhart2020} A.~D.~Degenhart et al. Stabilization of a
 brain--computer interface via the alignment of low-dimensional spaces of neural activity.
 \emph{Nature Biomedical Engineering}, 4:672--685, 2020.
