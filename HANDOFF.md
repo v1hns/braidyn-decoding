@@ -13,7 +13,9 @@ trained on the subject itself.** Population pooling as an alternative to per-sub
 - Live paper: `paper_neurips/pooling.tex` — 8 pages, compiles clean, in the author's own voice.
 - Headline: **+0.017 AUC, p = 5×10⁻⁵**, 73 of 100 mouse–event pairs, session-held-out.
 - **A second dataset replicated it** (Allen 2-photon, +0.0229, p = 0.0034) and has now been through
-  the full leakage-corrected protocol — see §5. Written into the paper; awaiting a dictation pass.
+  the full leakage-corrected protocol — see §5. Written into the paper, the **v6 dictation pass is
+  applied (2026-08-04)**, and the result is **synced to Overleaf**. The paper is done pending a
+  venue decision — see §11.
 - A second paper (`paper_methods/leakage.tex`) exists but the author **decided not to publish it**.
   Do not resurrect it without being asked.
 
@@ -259,17 +261,20 @@ A forward-citation sweep (114 citations of Safaie, 85 of NDT2, via Semantic Scho
 
 ## 8. External resources
 
-- GitHub: `v1hns/braidyn-decoding` — PRs #9–#13 merged to `main`. **#14 (Allen corrected protocol)
-  and #15 (paper write-up, stacked on #14) are OPEN** — agent merge was blocked by the permission
-  classifier, so they need `gh pr merge 14 --merge` then `gh pr merge 15 --merge`.
-- Overleaf (pooling paper): https://www.overleaf.com/project/6a5acae5bbb72f3b80b9173a — synced.
+- GitHub: `v1hns/braidyn-decoding` — **everything through PR #19 is merged to `main`** (`b5c476b`).
+  #18 = the v6 dictation pass, #19 = restoring the many-others arm.
+- Overleaf (pooling paper): https://www.overleaf.com/project/6a5acae5bbb72f3b80b9173a —
+  **synced 2026-08-04 and verified inside Overleaf** (searched the live source, compiles at 9 pp).
 - Overleaf (methods note, parked): https://www.overleaf.com/project/6a6c57c6faa0705a6da29f14
 - Worksheet Doc (drift paper, **dictation already applied**):
   `14gP87UxTIES-4PnpVBuPAgBFUvr0HQosfvXKHWQ5rfI`
 - Worksheet Doc (methods note, never used): `1CeFASJCpWGj1RkiGJ7X3uasrP5Mga_rECsbT40aonhU`
-- Worksheet Doc **v5** (two-dataset reframe, **awaiting dictation**):
+- Worksheet Doc **v5** (two-dataset reframe, superseded by v6 — ignore):
   `1mQTRXRLzQ2pjNGEr572SxcWxNlBLTEfUJqfURf1I46I`
   (a stray empty doc `15VVmnn1p6KQiMoRrcNm1e5V5EjKuNuAuECV2g9BrH9E` was created by mistake — delete it)
+- Worksheet Doc **v6** (**dictation done and applied**): `1GP_PFkfCG3S3hsmCn7pZPZsqv83GcWsma7GjnRwk-JY`
+  — the author's raw dictation lives here. It is speech-to-text: he thinks aloud, so it needs
+  interpreting, not pasting. Also in the repo as `WORKSHEET_v6.md` (blank template, no answers).
 - User memory: `~/.claude/projects/-Users-vihaanshringi/memory/project_braidyn_hit.md`
 
 **Overleaf upload gotcha:** uploading figures with the `figs` folder merely *selected* still dumps
@@ -316,7 +321,9 @@ zip instead.
 2. ~~Write it up as a Results subsection + update abstract/contributions.~~ **Done** — §5.7 + Table 4
    + methods paragraphs + abstract sentence + contributions bullet, PR #15 (stacked on #14). The
    write-up is **additive only**: not one existing sentence was reworded.
-3. **PENDING — the dictation pass.** The author asked to reframe the headline around both datasets
+3. ~~The dictation pass.~~ **DONE 2026-08-04 — see §12.** Original context below for provenance.
+
+   The author asked to reframe the headline around both datasets
    ("optimize for results"). That touches title/abstract/contributions/intro, all his prose, so
    **worksheet v5** was built instead of rewriting it:
    `1mQTRXRLzQ2pjNGEr572SxcWxNlBLTEfUJqfURf1I46I`. 16 chunks. Chunk 1 is the ordering decision
@@ -326,19 +333,58 @@ zip instead.
    - **Ch. 15 — the paper now contradicts itself.** Limitations says single-neuron codes "remains
      unknown"; the Allen replication *is* single-neuron two-photon.
    - **Ch. 14 —** Discussion says "four checks"; there are now five.
-4. **Overleaf sync is manual and was NOT done** — no Overleaf credentials or tool available to the
-   agent, and past sessions did it by hand. Only `pooling.tex` changed (no new figures), so it is a
-   single-file overwrite and the §8 figs-folder gotcha does not apply. Bundle also at
-   `~/Downloads/pooling_overleaf_2026-08-03.zip`.
-5. Decide venue. Workshop (non-archival, so an archival submission later is normally fine — but
-   **verify per-workshop CFP + host conference dual-submission clause**, this was NOT verified) vs
-   ICLR 2027 (deadline 2026-09-24). The Allen replication is exactly the "substantial new content"
-   an archival venue expects.
-4. Add a discussion sentence on §6 — the reason nobody tested this is that the data barely exists.
+4. ~~Overleaf sync.~~ **DONE 2026-08-04.** An agent CAN do this now — see §13. Single-file
+   overwrite of `pooling.tex`; the §8 figs-folder gotcha did not apply.
+5. **OPEN — decide venue.** Workshop (non-archival, so an archival submission later is normally
+   fine — but **verify per-workshop CFP + host conference dual-submission clause**, still NOT
+   verified) vs ICLR 2027 (deadline 2026-09-24). The Allen replication is exactly the "substantial
+   new content" an archival venue expects. **The author asked on 2026-08-04 to format for a
+   NeurIPS 2026 workshop — but did not name which one, and workshop page limits (commonly 4–5 pp)
+   would force real content cuts on an 8-page paper. Get the specific CFP before reformatting.**
+6. **OPEN** — add a discussion sentence on §6: the reason nobody tested this is that the data
+   barely exists.
 
 ---
 
-## 12. ⭐ START HERE — where the 2026-08-03 session left off
+## 12. ⭐ START HERE — where the 2026-08-04 session left off
+
+**The paper is finished and synced. The dictation pass that blocked it is done.**
+
+### What landed 2026-08-04
+
+- **v6 dictation applied** (PR #18) and **the many-others arm restored** (PR #19). `main` = `b5c476b`.
+- **Overleaf overwritten and verified from inside Overleaf** — searched the live source for the
+  restored sentence (1 of 1, line 385), recompiled there: 9 pp, no errors, matching local `pdflatex`.
+- **Option A** was the author's call: headline both cohorts, BraiDyn-BC primary, Allen as external
+  validation. Everything he dictated in v4 stands untouched.
+- **Both Part 3 items were factual, and both are fixed.** Limitations no longer claims single-neuron
+  codes "remain unknown" (it contradicted §5.7); Discussion now says **five** checks, not four.
+
+### Judgment calls made on his dictation — know these before re-editing
+
+His v6 dictation is **raw speech-to-text**; he thinks aloud mid-answer and contradicts himself, so it
+was interpreted rather than pasted. Three calls were flagged to him and he resolved one:
+
+1. **Count-matched, §5.7** — he said to cut the many-others arm as redundant. It was not redundant:
+   that arm carries the diversity ordering, the most robust part of the replication. He was told so,
+   **and asked for it back** (PR #19), kept concise. Do not cut it again.
+2. **Contributions bullet** — he called it useless; read as objecting to redundancy with the abstract,
+   so it was **compressed, not deleted**. He did not object. Leave as is.
+3. **Protocol-reversal paragraph, §5.7** — compressed 8 sentences to 4 at his request. His paraphrase
+   ("doesn't change anything") was factually wrong — the trial split *lowers* the asymmetry to
+   +0.014 — so the accurate claim was kept and only the framing cut. All numbers survive.
+
+Two of his dictated words were speech-to-text errors and were silently corrected: "7-dimensional"
+→ 27-dimensional, "acute lever pull" → cued lever pull.
+
+### What is actually left
+
+Only §11 items 5 and 6: **the venue decision** (and the unverified dual-submission clause), and one
+optional discussion sentence. Nothing blocks submission except choosing where.
+
+---
+
+## 12b. Archive — where the 2026-08-03 session left off
 
 The session ended on a deliberate **Claude Code restart** so the Claude in Chrome extension would be
 detected at startup. Everything below is already done and pushed to `main`.
@@ -354,7 +400,7 @@ detected at startup. Everything below is already done and pushed to `main`.
   missing, `allen2p_leakfix.py` re-streams 184 experiments from S3 (~10 min). Analyses alone are ~2 min.
 - Local venv at `.venv` (numpy/scipy/sklearn/h5py/remfile). The Mac paths in §9 do not apply here.
 
-### THE ONE THING BLOCKING THE PAPER: the dictation pass
+### ~~THE ONE THING BLOCKING THE PAPER: the dictation pass~~ — RESOLVED, see §12
 
 `WORKSHEET_v6.md` in this repo. **Do not ask the author to re-dictate anything from v4.** v5 made
 that mistake and he called it out. v6 is deliberately small:
@@ -400,3 +446,46 @@ Worth knowing before planning around them: `sudo apt-get install` and
 `mcp__claude_ai_Google_Drive__create_file` were both denied mid-session (Drive had worked earlier).
 The author ran the apt install by hand. If a Doc is needed again, either retry Drive or create it
 through the now-working browser.
+
+**Update 2026-08-04: `Drive create_file` works again** — the v6 dictation Doc was created with it.
+That constraint is stale.
+
+---
+
+## 13. Browser + Overleaf: an agent CAN do this now (2026-08-04)
+
+The restart worked. `mcp__claude-in-chrome__*` tools are present at startup and drive the Chrome on
+`:99`. Verify with `tabs_context_mcp` — **"no tab group exists" is a success**, it means the
+extension answered. Confirm one round-trip rather than trusting the tool list.
+
+### The Overleaf sync recipe that worked (single .tex, no figures)
+
+1. `navigate` to `https://www.overleaf.com/project` and `find` the project link. **Check the href
+   matches `6a5acae5bbb72f3b80b9173a` before touching anything** — do not overwrite on a name match.
+2. Open the project, click the upload icon in the file-tree header (~`222,47`).
+3. `find` the file input, then **`file_upload`** with the absolute path. Do **not** click the input —
+   that opens a native picker the extension cannot see.
+4. Overleaf asks "Do you want to overwrite them?" → click **Overwrite**.
+5. Dismiss the "Document Updated Externally" modal, then **Recompile** (~`963,46`) and wait ~9 s.
+6. **Verify inside Overleaf**, not just locally: Ctrl+F the editor for a phrase you just changed and
+   confirm the match. Local-file-equals-main is not evidence that the upload landed.
+
+Still **free plan → no git bridge**. Don't propose it.
+
+`~/CHROME.md` is a short generic primer for pointing other Claude Code tabs at this browser stack.
+
+### Security posture of this box — audited 2026-08-04
+
+Relevant because the browser profile holds live Google/Overleaf sessions and any agent inherits them.
+
+- **Good:** SSH is key-only (`passwordauthentication no`), `ufw` active with only 22/tcp + mosh open,
+  VNC/noVNC correctly loopback-only.
+- **Weak, and worth knowing:** there is **no keyring** and no `os_crypt.encrypted_key`, so Chrome
+  falls back to a hardcoded key — `~/.chrome-vps/Default/Cookies` and `Login Data` are effectively
+  plaintext to anyone with the files. The disk is **unencrypted** (plain ext4, VPS provider can
+  snapshot it), and there is **8 G of unencrypted swap**.
+- The author asked about logging a leadership dashboard into this profile. The advice given, and it
+  still stands: **encryption at rest does not fix unattended agent access** — the passphrase would
+  have to live on the box. The lever is blast radius, not crypto: prefer a push feed or a scoped
+  read-only token over a full SSO browser session, and keep any sensitive login in a **separate
+  Chrome profile** from `~/.chrome-vps`. Unresolved as of this writing.
