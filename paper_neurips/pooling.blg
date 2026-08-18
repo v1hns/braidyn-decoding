@@ -1,0 +1,68 @@
+This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: pooling.aux
+The style file: plainnat.bst
+I found no \bibdata command---while reading file pooling.aux
+Warning--I didn't find a database entry for "rule2020"
+Warning--I didn't find a database entry for "driscoll2017"
+Warning--I didn't find a database entry for "schoonover2021"
+Warning--I didn't find a database entry for "degenhart2020"
+Warning--I didn't find a database entry for "jarosiewicz2015"
+Warning--I didn't find a database entry for "musall2019"
+Warning--I didn't find a database entry for "macdowell2020"
+Warning--I didn't find a database entry for "macdowell2024"
+Warning--I didn't find a database entry for "wicat2026"
+Warning--I didn't find a database entry for "kondo2025"
+Warning--I didn't find a database entry for "rule2019"
+Warning--I didn't find a database entry for "wilson2025"
+Warning--I didn't find a database entry for "farshchian2019"
+Warning--I didn't find a database entry for "karpowicz2025"
+Warning--I didn't find a database entry for "melbaum2022"
+Warning--I didn't find a database entry for "schneider2023"
+Warning--I didn't find a database entry for "peterson2021"
+Warning--I didn't find a database entry for "neds2025"
+Warning--I didn't find a database entry for "metaalign2025"
+Warning--I didn't find a database entry for "safaie2023"
+Warning--I didn't find a database entry for "allenvb2023"
+You've used 0 entries,
+            2773 wiz_defined-function locations,
+            612 strings with 5065 characters,
+and the built_in function-call counts, 33 in all, are:
+= -- 0
+> -- 0
+< -- 0
++ -- 0
+- -- 0
+* -- 2
+:= -- 10
+add.period$ -- 0
+call.type$ -- 0
+change.case$ -- 0
+chr.to.int$ -- 0
+cite$ -- 0
+duplicate$ -- 0
+empty$ -- 1
+format.name$ -- 0
+if$ -- 1
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 0
+newline$ -- 8
+num.names$ -- 0
+pop$ -- 0
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 1
+stack$ -- 0
+substring$ -- 0
+swap$ -- 0
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 0
+width$ -- 0
+write$ -- 7
+(There was 1 error message)

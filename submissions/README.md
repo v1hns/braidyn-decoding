@@ -4,7 +4,8 @@ Source of truth is `paper_neurips/pooling.tex` (8 pp main text). These are deriv
 
 | dir | venue | deadline | limit | template | build | main text now | cut needed |
 |---|---|---|---|---|---|---|---|
-| `neuroai_2026/` | NeuroAI: Closed-Loop NeuroAI | Aug 29 | 5 pp excl. refs | NeurIPS 2026 (**same as source**) | ✅ clean | ~8 pp | ~37% |
+| `brainbodyfm_2026/` | Foundation Models for the Brain and Body | Sept 5 | 5 pp excl. refs + appendices | their `neurips_2025.sty` | ✅ clean | **5 pp exactly** | done |
+| ~~`neuroai_2026/`~~ | ~~Closed-Loop NeuroAI~~ | — | — | — | — | — | **workshop NOT accepted for 2026** |
 | `neurreps_2026/` | NeurReps Extended Abstract | **Aug 22** | 4 pp excl. refs | `jmlr` `mlabstract` | ✅ clean | ~9 pp | ~56% |
 
 Both venues are double-blind; the source is already anonymised.
@@ -29,3 +30,24 @@ editorial decision on the author's prose, not a formatting task.
 
     cd neuroai_2026  && pdflatex pooling.tex && pdflatex pooling.tex
     cd neurreps_2026 && pdflatex abstract.tex && bibtex abstract && pdflatex abstract.tex && pdflatex abstract.tex
+
+
+## The 5-page cut (`brainbodyfm_2026/pooling_5pp.tex`)
+
+Main text lands on **exactly 5 pages**; references start on p6; appendices run p7-9.
+Brain-and-Body excludes **both** references *and appendices* from the limit, so detail was
+**moved, not deleted**:
+
+| Moved to appendix | Kept in main text |
+|---|---|
+| Full related work (App. A) | Headline asymmetry +0.017 and Table 1 |
+| Full methods (App. B) | Event-overlap honesty (short form) |
+| Day-by-day decay regression (App. C) | Count-matched control + Fig. 1 |
+| Event timing/overlap detail (App. D) | Protocol caution (short form) |
+| Validation-protocol detail (App. E) | Allen replication in full + Table 2 |
+
+**Genuinely deleted**, not moved: `fig_decay`; the §5.5 scaling subsection (folded into §5.4 as
+two sentences); the standalone Reproducibility section (folded into Limitations as one sentence);
+and roughly six sentences of the author's prose, removed whole rather than reworded.
+
+`neuroai_2026/` is retained only for provenance — that workshop was not among the 102 accepted.
