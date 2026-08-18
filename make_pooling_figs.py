@@ -33,12 +33,14 @@ axL.set_xticks(x); axL.set_xticklabels([nice[t] for t in T], fontsize=7)
 axL.set_ylabel("aging  (AUC lost early$\\to$late)")
 axL.set_title("Count-matched: whose data ages less?\n(equal training-event count, sessions held out)",
               fontsize=8)
-# y is inverted (more-negative = ages less = better -> drawn upward). Setting the limits
-# explicitly, with 30% padding on the negative end, keeps the legend clear of the tallest
-# bars instead of letting it land on top of lever-pull.
+# Both panels must share one orientation, or the reader compares them wrongly: this axis
+# used to be inverted (better = up) while the right panel is standard (better = down).
+# Standard here too, so "lower = ages less" is literally true on the page in both, and
+# matches the caption's "lower values indicate greater robustness". 30% headroom at the
+# top keeps the legend off the bars.
 lo, hi = min(extent), max(extent)
 span = hi - lo
-axL.set_ylim(hi + 0.06 * span, lo - 0.30 * span)
+axL.set_ylim(lo - 0.06 * span, hi + 0.30 * span)
 axL.legend(fontsize=6, ncol=3, loc="upper center", frameon=False)
 axL.text(0.01, 0.02, "lower = ages less", transform=axL.transAxes, fontsize=6, color="#555")
 
