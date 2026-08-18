@@ -21,9 +21,11 @@ fig, (axL, axR) = plt.subplots(1, 2, figsize=(7.2, 2.8))
 groups = [("self", "self", "#c0392b"), ("one", "one\nother", "#e59866"),
           ("many", "many\nothers", "#5d6d7e")]
 x = np.arange(len(T)); w = 0.26
+extent = []  # track bar+errorbar extremes so the legend can be given clear headroom
 for i, (k, lab, c) in enumerate(groups):
     vals = [R["C"][t]["fixed"][k]["aging"] for t in T]
     err = [R["C"][t]["fixed"][k]["sem"] for t in T]
+    extent += [v + e for v, e in zip(vals, err)] + [v - e for v, e in zip(vals, err)]
     axL.bar(x + (i - 1) * w, vals, w, yerr=err, capsize=2, color=c, label=lab,
             edgecolor="k", linewidth=0.4)
 axL.axhline(0, c="gray", lw=0.7)
@@ -31,8 +33,13 @@ axL.set_xticks(x); axL.set_xticklabels([nice[t] for t in T], fontsize=7)
 axL.set_ylabel("aging  (AUC lost early$\\to$late)")
 axL.set_title("Count-matched: whose data ages less?\n(equal training-event count, sessions held out)",
               fontsize=8)
+# y is inverted (more-negative = ages less = better -> drawn upward). Setting the limits
+# explicitly, with 30% padding on the negative end, keeps the legend clear of the tallest
+# bars instead of letting it land on top of lever-pull.
+lo, hi = min(extent), max(extent)
+span = hi - lo
+axL.set_ylim(hi + 0.06 * span, lo - 0.30 * span)
 axL.legend(fontsize=6, ncol=3, loc="upper center", frameon=False)
-axL.invert_yaxis()  # more-negative = ages less = better -> plot downward as "better"
 axL.text(0.01, 0.02, "lower = ages less", transform=axL.transAxes, fontsize=6, color="#555")
 
 # RIGHT: scaling -- pooled aging vs number of training mice N
