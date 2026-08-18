@@ -107,11 +107,11 @@ Appendix~\ref{app:related} gives the full discussion.
 
 \section{Data and methods}
 BraiDyn-BC \citep{kondo2025} (DANDI:001425) provides hemodynamically corrected dorsal-cortex
-$\Delta F/F$ parcellated into 44 Allen CCF regions at $\sim$30\,Hz for 25 mice, each completing
+$\Delta F/F$ parcellated into 44 Allen Common Coordinate Framework (CCF) regions at $\sim$30\,Hz for 25 mice, each completing
 $\sim$15 daily operant sessions over $\sim$3 weeks. For each onset of four events (lever pull, lick,
 reward, tone) we build a 44-dimensional evoked feature: mean $\Delta F/F$ over $0$--$1$\,s minus the
 $-0.5$--$0$\,s baseline, per parcel. Each event is decoded against matched negatives by
-$\ell_2$-regularized logistic regression, scored by $\auc$.
+$\ell_2$-regularized logistic regression, scored by area under the receiver-operating characteristic curve ($\auc$).
 
 Sessions are grouped into an early block (days 1--5) and a late block (days 11--15). The personal
 decoder leaves out one whole early \emph{session} at a time, training on the mouse's remaining early
@@ -123,7 +123,7 @@ personal decoder ages more. Significance is a paired sign-flip permutation test 
 (20{,}000 permutations), with cluster-bootstrap CIs.
 
 The external validation cohort is Allen Visual Behavior two-photon \citep{allenvb2023}: containers
-spanning $\geq$14 days, all experiments in VISp within one 50\,\textmu m depth bin
+spanning $\geq$14 days, all experiments in primary visual cortex (VISp) within one 50\,\textmu m depth bin
 (150--199\,\textmu m; 25 mice, 184 experiments), leaving 23 mice after per-experiment QC. As
 different animals have no neuron correspondence and the subset is single-plane, the comparable
 representation is a permutation-invariant summary of the population response: per-neuron evoked
@@ -150,7 +150,11 @@ estimate is the claim we defend; the per-event column is data.
 training fixed), per event, $n = 25$ mice, with whole early sessions held out. Asymmetry $=$
 personal $-$ pooled aging; a positive value means the mouse's own decoder ages more. $p$: paired
 sign-flip permutation. The rightmost column gives the same asymmetry under a trial-level split, the
-protocol this analysis replaces (Section~\ref{sec:protocol}).}
+protocol this analysis replaces (Section~\ref{sec:protocol}). The asymmetry column is the
+quantity of interest and is positive for every event; the bolded pooled row over all 100
+mouse--event pairs is the estimate we defend, while the per-event rows are reported as data rather
+than as four independent findings. Comparing the last two columns shows how much of each per-event
+estimate the trial-level split would have added.}
 \label{tab:asym}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{lccccccc}
@@ -220,7 +224,10 @@ refine it further.
 (AUC lost from early to late; lower values indicate greater robustness) is compared for the subject's
 own data (self), one other mouse, and many other mice. \textbf{Right:} pooled aging as a function of
 the number of training mice $N$. Greater diversity provides a small additional gain, with immediate
-saturation for lever pull.}
+saturation for lever pull. The reader should take two things from this panel pair: at equal
+training-event count the \emph{self} bar ages most for three of the four events, so the effect is
+not explained by data volume; and \emph{many} ages least for all four, so diversity of training
+individuals adds a further, smaller benefit.}
 \label{fig:mech}\end{figure}
 
 \subsection{How much the validation protocol matters}
@@ -277,7 +284,10 @@ replication is not an artifact of the split.
 \caption{The aging asymmetry on the original cohort and on the external validation dataset. Aging
 is $\auc$ lost from early to late test with training held fixed; asymmetry is personal $-$ pooled
 aging, positive when the subject's own decoder ages more. Both rows use the same session-held-out
-protocol and the same count-matched control. $p$: paired sign-flip permutation.}
+protocol and the same count-matched control. $p$: paired sign-flip permutation. The two rows are
+independent cohorts differing in laboratory, recording modality, task and feature space; both
+asymmetries are positive and of comparable magnitude, which is the replication claim. The note
+below shows the count-matched control reproducing the same ordering in both.}
 \label{tab:allen}
 \setlength{\tabcolsep}{3pt}
 {\small
@@ -311,7 +321,7 @@ The effect is small in absolute terms, and we think it is worth being explicit a
 it anyway. It rests on 25 animals and 357 recording sessions, and it is supported by five checks that
 are not variations on one analysis. A two-block contrast and a day-by-day regression are different
 estimators and select the same events. The count-matched control fixes the training-set size, so the
-result cannot be a data-volume artifact. Replacing the linear readout with a 1-D CNN or a GRU leaves
+result cannot be a data-volume artifact. Replacing the linear readout with a one-dimensional convolutional neural network (CNN) or a gated recurrent unit (GRU) leaves
 it in place. Holding out whole sessions rather than trials removes an inflation large enough to
 eliminate one of the four events entirely -- the effect reported here is what remains after that
 correction, not before it. And it reproduced in a second cohort recorded in another laboratory with a
