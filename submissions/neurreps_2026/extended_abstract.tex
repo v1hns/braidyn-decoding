@@ -3,7 +3,7 @@
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{amsmath}
-\usepackage{capt-of}
+\usepackage{float}
 
 \newcommand{\auc}{\mathrm{AUC}}
 
@@ -294,12 +294,11 @@ each arm's aging separately. On the Allen cohort a single pooled $\auc$ cost $-0
 ($p<10^{-4}$) and dominated the leakage term it was confounded with.
 \end{enumerate}
 \end{minipage}}
-\captionof{table}{}\label{box:practice}
 \end{center}
 
 \section{Per-event results}
 \label{app:perevent}
-\begin{table}[t]\centering
+\begin{table}[H]\centering
 \caption{Personal vs.\ pooled aging across days ($\auc$ lost from early to late test, holding
 training fixed), per event, $n = 25$ mice, with whole early sessions held out. Asymmetry $=$
 personal $-$ pooled aging; a positive value means the mouse's own decoder ages more. $p$: paired
