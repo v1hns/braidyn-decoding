@@ -155,31 +155,30 @@ one is the empirical question we ask.
 \section{Data and methods}
 BraiDyn-BC \citep{kondo2025} (DANDI:001425) provides hemodynamically corrected dorsal-cortex
 $\Delta F/F$ parcellated into 44 Allen Common Coordinate Framework regions for 25 mice, each
-completing $\sim$15 daily operant sessions over $\sim$3 weeks. For each onset of four events (lever
-pull, lick, reward, tone) we build a 44-dimensional evoked feature -- the mean $\Delta F/F$ over
-$0$--$1$\,s minus the $-0.5$--$0$\,s baseline, per parcel -- and decode it against matched negatives
-with $\ell_2$-regularized logistic regression, scored by area under the receiver-operating
-characteristic curve ($\auc$).
+completing $\sim$15 daily operant sessions over $\sim$3 weeks. For each of the four events we build a
+44-dimensional evoked feature representing the mean $\Delta F/F$ over $0$--$1$\,s minus the baseline,
+per parcel, and decode it against matched negatives with $\ell_2$-regularized logistic regression,
+scored by the area under the receiver-operating characteristic curve ($\auc$).
 
-Sessions are grouped into an early block (days 1--5) and a late block (days 11--15). The personal
-decoder leaves out one whole early \emph{session} at a time, training on the mouse's remaining early
-sessions and scoring both on the held-out session and on the late block; the pooled decoder trains
-once on the other mice's early blocks and is scored on the same held-out data. Aging is the accuracy
-lost as testing moves from early to late with training fixed, and the per-mouse asymmetry is personal
+Sessions are grouped into an early block and a late block. The personal decoder leaves out one early
+session at a time; training is on the mouse's remaining early sessions and scoring is both on the
+left-out session and the late block. The pooled decoder trains once on the \emph{other} mice's early
+blocks and is scored on the same held-out data.
+
+Aging is the accuracy lost as testing moves from early to late. The per-mouse asymmetry is personal
 aging minus pooled aging, positive when the personal decoder ages more. Significance is a paired
-sign-flip permutation test across mice (20{,}000 permutations), with cluster-bootstrap confidence
-intervals. Holding out whole sessions rather than trials is essential rather than incidental: only
-the within-subject arm can share a session between train and test, so a trial-level split inflates
-that arm alone and the bias lands directly on the difference being reported.
+sign-flip permutation test across mice, with cluster-bootstrap confidence intervals.
 
-The external validation cohort is Allen Visual Behavior two-photon \citep{allenvb2023}: containers
-spanning at least 14 days whose experiments are all in VISp within a single 50\,\textmu m depth bin,
-leaving 23 mice after per-experiment quality control. Because different animals have no neuron
-correspondence and the longitudinal subset is single-plane, the representation that is comparable
-across animals is a permutation-invariant summary of the population response, giving a fixed
-27-dimensional feature regardless of how many cells were segmented. The decoded contrast is
-\texttt{is\_change}, a real image change against a sham catch trial. Appendix~\ref{app:methods}
-gives both cohorts in full.
+Holding out whole sessions rather than trials is essential, as only the within-subject arm can share
+a session between training and test. The external validation cohort is Allen Visual Behavior
+two-photon \citep{allenvb2023}: containers spanning at least 14 days whose experiments are all in
+VISp within a single 50\,\textmu m depth bin, leaving 23 mice after quality control. Because
+different animals have no neuron correspondence, the representation that is comparable is a
+permutation-invariant summary of the population response, giving a 27-dimensional feature regardless
+of how many cells were segmented.
+
+The decoded contrast is \texttt{is\_change}, a real image change against a matched catch trial with
+no change. Appendix~\ref{app:methods} gives both cohorts in full.
 
 \section{Results}
 
@@ -266,13 +265,13 @@ saturation for lever pull.}
 
 \subsection{Measuring it correctly}
 \label{sec:protocol}
-Every number reported above holds out whole recording sessions. Repeating the identical analysis on
-the identical features with a trial-level split inflates the personal decoder's within-block accuracy
-by $+0.013$ (lever pull), $+0.010$ (lick), $+0.009$ (reward) and $+0.000$ $\auc$ (tone), while
-leaving the pooled decoder untouched. The inflation therefore lands on one side of the difference,
-and for lever pull it is the entire effect: a significant-looking $+0.014$ ($p = 0.001$) becomes
-$+0.003$ ($p = 0.37$). Any comparison of a within-subject decoder against a cross-subject one is
-exposed to this, since only the within-subject arm can share a session between train and test.
+Every number reported above holds out whole recording sessions. Repeating the analysis with a
+trial-level split inflates the personal decoder's within-block accuracy by $+0.013$ (lever pull),
+$+0.010$ (lick), $+0.009$ (reward) and $+0.000$ $\auc$ (tone), while leaving the pooled decoder
+untouched. The inflation therefore lands on one side of the difference, and for lever pull this is
+the entire effect: a significant-looking $+0.014$ ($p = 0.001$) becomes $+0.003$ ($p = 0.37$). Any
+comparison of a within-subject decoder against a cross-subject one is exposed to this, since only
+the within-subject arm can share sessions between train and test.
 
 \subsection{The effect replicates on an independent dataset}
 \label{sec:allen}
@@ -341,12 +340,15 @@ did.
 
 
 \textbf{Code and data availability.} Both cohorts are public (DANDI:001425; Allen Brain
-Observatory). The analysis code and streaming feature pipeline are released; the repository link is
-withheld here to preserve anonymity and will be given in the camera-ready version.
+Observatory). The analysis code and streaming feature pipeline are released.
 
-\textbf{Limitations.} The four events are not four independent behaviors but four thresholded
-channels of one cued lever-pull trial, overlapping to the point where $100\%$ of reward windows also
-contain licking, so we cannot always say which behavior the effect belongs to.
+\textbf{Limitations.} The clearest limitation is what the four events are. They are not four
+independent behaviors but four thresholded channels of one cued lever-pull trial, overlapping to the
+point where $100\%$ of reward windows also contain licking, and differing tenfold in event count. We
+therefore cannot always say which behavior the effect belongs to, nor can we exclude the idea that
+the per-event ranking is a tracker of how much data each decoder had to overfit. A design with
+temporally separated, count-matched events would settle both, and is the experiment we would run
+next.
 
 We measure at the mesoscale, using parcel-averaged activity, and while the two-photon replication
 does reach single neurons it does so only at one depth in one visual area.
@@ -354,9 +356,11 @@ does reach single neurons it does so only at one depth in one visual area.
 The analysis covers a two-week interval in one species, and nothing here establishes how the
 asymmetry behaves over the months-to-years horizon on which a deployed decoder has to survive.
 
-Finally, the trial-level inflation of Section~\ref{sec:protocol} is a caution rather than a
-limitation of this work, because it is a limitation we do not have: every number we report is
-measured after holding out whole sessions. The practical consequences are collected in
+Finally, the trial-level inflation of Section~\ref{sec:protocol} is worth stating as a caution
+rather than as a limitation of this work, because it is a limitation we do not have. It is large
+enough to manufacture an effect that is not there -- on lever pull it manufactured the entire effect
+-- and every number we report is measured after holding out whole sessions, not before. We raise it
+because any comparison of this shape is exposed to it, and the correction is the one in
 Appendix~\ref{app:practice}.
 
 \begin{thebibliography}{99}
@@ -563,7 +567,7 @@ therefore a permutation-invariant summary of the population response: per neuron
 $\Delta F/F$ over $0$--$1$\,s minus the mean over $-0.5$--$0$\,s, then describe the distribution of
 those evoked responses by 25 quantiles plus its mean and standard deviation, giving a fixed
 27-dimensional feature regardless of how many cells were segmented. The decoded contrast is
-\texttt{is\_change}, a real image change against a sham catch trial, which is a stimulus contrast
+\texttt{is\_change}, a real image change against a matched catch trial with no change, which is a stimulus contrast
 rather than a reward- or lick-coupled one. Each mouse's sessions are split by date into early and
 late halves, and the personal decoder, the pooled decoder, aging, the asymmetry and the
 count-matched control are all defined exactly as above.
