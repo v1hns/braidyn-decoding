@@ -165,9 +165,9 @@ session at a time; training is on the mouse's remaining early sessions and scori
 left-out session and the late block. The pooled decoder trains once on the \emph{other} mice's early
 blocks and is scored on the same held-out data.
 
-Aging is the accuracy lost as testing moves from early to late. The per-mouse asymmetry is personal
-aging minus pooled aging, positive when the personal decoder ages more. Significance is a paired
-sign-flip permutation test across mice, with cluster-bootstrap confidence intervals.
+Aging is the accuracy lost as testing moves from early to late, and the per-mouse asymmetry is
+personal aging minus pooled aging, positive when the personal decoder ages more. Significance is a
+paired sign-flip permutation test across mice, with cluster-bootstrap confidence intervals.
 
 Holding out whole sessions rather than trials is essential, as only the within-subject arm can share
 a session between training and test. The external validation cohort is Allen Visual Behavior
@@ -178,7 +178,7 @@ permutation-invariant summary of the population response, giving a 27-dimensiona
 of how many cells were segmented.
 
 The decoded contrast is \texttt{is\_change}, a real image change against a matched catch trial with
-no change. Appendix~\ref{app:methods} gives both cohorts in full.
+no change; Appendix~\ref{app:methods} gives both cohorts in full.
 
 \section{Results}
 
@@ -227,13 +227,11 @@ $+0.013$, many $+0.003$; self $-$ one $= +0.011$, many $-$ one $= -0.010$.
 \subsection{Ruling out the alternative explanations}
 \label{sec:matched}
 A pooled decoder contains $\sim$24$\times$ more training events than a personal decoder, so its
-stability could reflect data volume rather than pooling. We test this with a count-matched control
-(Fig.~\ref{fig:mech}, left). For each held-out early session $s$ of each mouse we set the
-training-set size to $n$, the number of events in that mouse's remaining early sessions, and compare
-three decoders: \emph{self}, trained on those $n$ events; \emph{one}, trained on $n$ events from a
-single other mouse; and \emph{many}, trained on $n$ events drawn across the other 24 mice. All three
-are scored on the same held-out session $s$ and the same late block, so they differ only in whose
-data they were fit on.
+stability could reflect data volume rather than pooling. We test this with a count-matched control (Fig.~\ref{fig:mech}, Appendix~\ref{app:fig}). For each held-out early session $s$ we set the training-set size to
+$n$, the number of events in that mouse's remaining early sessions, and compare three decoders:
+\emph{self}, trained on those $n$ events; \emph{one}, on $n$ events from a single other mouse; and
+\emph{many}, on $n$ events drawn across the other 24 mice. All three are scored on the same held-out
+session and late block, so they differ only in whose data they were fit on.
 
 For the events where there was an asymmetry, the count-matched ordering reproduces it. The self
 decoder ages more than a decoder trained on one other mouse by $+0.010$ $\auc$ on average, and by
@@ -241,27 +239,12 @@ $+0.007$ for lick, $+0.017$ for reward and $+0.006$ for tone individually. As bo
 same number of training events, this is not a data-volume artifact.
 
 The diversity ordering is the most robust result in this analysis: \emph{many} ages less than
-\emph{one} for all four events, including lever pull ($-0.026$ vs.\ $-0.020$). Training on a diverse
-set of individuals rather than a single other individual therefore provides a smaller, additional
-benefit that does not depend on which event is decoded.
-
-We next vary the number of training mice, $N \in \{1, 2, 4, 8, 16, 24\}$ (Fig.~\ref{fig:mech},
-right). As $N$ increases, pooled aging becomes slightly more favorable for lick ($-0.001$ to
-$-0.010$), reward ($-0.004$ to $-0.010$), and tone ($+0.003$ to $-0.010$); lever pull saturates with
-a single training mouse and remains near $-0.025$. The scaling effect is around $0.01$ $\auc$,
-comparable to the self-versus-one-other gap of Section~\ref{sec:matched}. Most of the resistance to
+\emph{one} for all four events, including lever pull ($-0.026$ vs.\ $-0.020$). Varying the number of
+training mice confirms this is a secondary effect of around $0.01$ $\auc$: most of the resistance to
 drift is already present when training on a single other individual, and additional individuals
-refine it further. This analysis never lets the decoder see the held-out mouse, so it is unaffected
-by the protocol issue below.
+refine it further.
 
-\begin{figure}[t]\centering
-\includegraphics[width=0.98\linewidth]{figs/fig_mechanism.pdf}
-\caption{\textbf{Left:} count-matched control. With equal numbers of training events, decoder aging
-(AUC lost from early to late; lower values indicate greater robustness) is compared for the subject's
-own data (self), one other mouse, and many other mice. \textbf{Right:} pooled aging as a function of
-the number of training mice $N$. Greater diversity provides a small additional gain, with immediate
-saturation for lever pull.}
-\label{fig:mech}\end{figure}
+
 
 \subsection{Measuring it correctly}
 \label{sec:protocol}
@@ -342,26 +325,17 @@ did.
 \textbf{Code and data availability.} Both cohorts are public (DANDI:001425; Allen Brain
 Observatory). The analysis code and streaming feature pipeline are released.
 
-\textbf{Limitations.} The clearest limitation is what the four events are. They are not four
-independent behaviors but four thresholded channels of one cued lever-pull trial, overlapping to the
-point where $100\%$ of reward windows also contain licking, and differing tenfold in event count. We
-therefore cannot always say which behavior the effect belongs to, nor can we exclude the idea that
-the per-event ranking is a tracker of how much data each decoder had to overfit. A design with
-temporally separated, count-matched events would settle both, and is the experiment we would run
+\textbf{Limitations.} The clearest limitation is what the four events are: not four independent
+behaviors but four thresholded channels of one cued lever-pull trial, overlapping to the point where
+$100\%$ of reward windows also contain licking, so we cannot always say which behavior the effect
+belongs to. A design with temporally separated, count-matched events is the experiment we would run
 next.
 
-We measure at the mesoscale, using parcel-averaged activity, and while the two-photon replication
-does reach single neurons it does so only at one depth in one visual area.
-
-The analysis covers a two-week interval in one species, and nothing here establishes how the
-asymmetry behaves over the months-to-years horizon on which a deployed decoder has to survive.
-
-Finally, the trial-level inflation of Section~\ref{sec:protocol} is worth stating as a caution
-rather than as a limitation of this work, because it is a limitation we do not have. It is large
-enough to manufacture an effect that is not there -- on lever pull it manufactured the entire effect
--- and every number we report is measured after holding out whole sessions, not before. We raise it
-because any comparison of this shape is exposed to it, and the correction is the one in
-Appendix~\ref{app:practice}.
+We also measure at the mesoscale, and the two-photon replication reaches single neurons only at one
+depth in one visual area; the analysis covers two weeks in one species. Finally, the trial-level
+inflation of Section~\ref{sec:protocol} is a caution rather than a limitation of this work: it is
+large enough to manufacture an effect that is not there, and every number we report is measured
+after holding out whole sessions (Appendix~\ref{app:practice}).
 
 \begin{thebibliography}{99}
 \bibitem[Allen Institute for Brain Science(2023)]{allenvb2023} Allen Institute for Brain Science.
@@ -426,6 +400,17 @@ arXiv:2607.09754.
 \end{thebibliography}
 
 \appendix
+
+\section{Count-matched control and diversity scaling}
+\label{app:fig}
+\begin{figure}[H]\centering
+\includegraphics[width=0.85\linewidth]{figs/fig_mechanism.pdf}
+\caption{\textbf{Left:} count-matched control. With equal numbers of training events, decoder aging
+(AUC lost from early to late; lower values indicate greater robustness) is compared for the subject's
+own data (self), one other mouse, and many other mice. \textbf{Right:} pooled aging as a function of
+the number of training mice $N$. Greater diversity provides a small additional gain, with immediate
+saturation for lever pull.}
+\label{fig:mech}\end{figure}
 
 \section{Best-practice checklist}
 \label{app:practice}
